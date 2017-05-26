@@ -1,0 +1,9 @@
+<resources>
+
+  <string name="app_name">Resource Manager Sample</string>
+  <string name="activity_a">Activity A</string>
+  <string name="activity_b">Activity B</string>
+  <string name="one_arg_formatted_string">This format strings has %1$d args</string>
+  <string name="first_half_of_month">This month isn\'t even half over…</string>
+  <string name="second_half_of_month">This month is almost over!</string>
+</resources>

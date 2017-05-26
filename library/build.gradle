@@ -1,0 +1,31 @@
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+
+sourceCompatibility = JavaVersion.VERSION_1_7
+targetCompatibility = JavaVersion.VERSION_1_7
+
+task sourceJar(type: Jar) {
+  from sourceSets.main.allJava
+}
+
+publishing {
+  repositories {
+    maven {
+      url "$buildDir/repo"
+    }
+  }
+
+  publications {
+    mavenJava(MavenPublication) {
+      groupId rootProject.groupId
+      artifactId "$rootProject.artifactPrefix-library"
+      version rootProject.publishVersion
+
+      from components.java
+
+      artifact sourceJar {
+        classifier "sources"
+      }
+    }
+  }
+}

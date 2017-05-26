@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        is-multidex="false"
+        jar="/Users/mdappo200/Projects/resourceprovider/library/build/libs/library.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.3"
+        sha1="6ab2d3d1f62638b4348d5a30897fa18947d5c77b">
+        <dex dex="/Users/mdappo200/Projects/resourceprovider/sample/build/intermediates/pre-dexed/debug/library_16565f18693673f148166c32ba3aaecb0f55ee85.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/mdappo200/Projects/Android-StaticLauncher/api/build/libs/api.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.3"
+        sha1="9251f8835b9d4e6bbf005b1bbc0db3c051a2f721">
+        <dex dex="/Users/mdappo200/Projects/Android-StaticLauncher/sample/build/intermediates/pre-dexed/debug/api_e47c07035a119ce9122b32d3c66c840a5ef4daef.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/mdappo200/.gradle/caches/modules-2/files-2.1/com.jakewharton/butterknife/6.1.0/63735f48b82bcd24cdd33821342428252eb1ca5a/butterknife-6.1.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.3"
+        sha1="63735f48b82bcd24cdd33821342428252eb1ca5a">
+        <dex dex="/Users/mdappo200/Projects/Android-StaticLauncher/sample/build/intermediates/pre-dexed/debug/butterknife-6.1.0_558c9293aeab3fca6babac1f93068e7faf2d7024.jar" />
+    </item>
+
+</items>

@@ -1,0 +1,87 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /Users/mdappo200/Projects/resourceprovider/sample/src/main/AndroidManifest.xml:1:1-23:12
+	package
+		ADDED from /Users/mdappo200/Projects/resourceprovider/sample/src/main/AndroidManifest.xml:2:5-50
+		INJECTED from /Users/mdappo200/Projects/resourceprovider/sample/src/main/AndroidManifest.xml
+		INJECTED from /Users/mdappo200/Projects/resourceprovider/sample/src/main/AndroidManifest.xml
+	android:versionName
+		INJECTED from /Users/mdappo200/Projects/resourceprovider/sample/src/main/AndroidManifest.xml
+		INJECTED from /Users/mdappo200/Projects/resourceprovider/sample/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /Users/mdappo200/Projects/resourceprovider/sample/src/main/AndroidManifest.xml:1:11-69
+	android:versionCode
+		INJECTED from /Users/mdappo200/Projects/resourceprovider/sample/src/main/AndroidManifest.xml
+		INJECTED from /Users/mdappo200/Projects/resourceprovider/sample/src/main/AndroidManifest.xml
+application
+ADDED from /Users/mdappo200/Projects/resourceprovider/sample/src/main/AndroidManifest.xml:5:3-21:17
+MERGED from [com.android.support:appcompat-v7:25.3.1] /Users/mdappo200/.android/build-cache/402999a5cd9f22c6bd4e11ee370ffd02f5a4df73/output/AndroidManifest.xml:29:5-20
+MERGED from [com.android.support:support-v4:25.3.1] /Users/mdappo200/.android/build-cache/296dfe257c854676f86d5b4582ce313c336e0e4b/output/AndroidManifest.xml:29:5-20
+MERGED from [com.android.support:support-fragment:25.3.1] /Users/mdappo200/.android/build-cache/cdbcb9ae9986ce96b43ff9d5dc0e2c5ecad14c10/output/AndroidManifest.xml:29:5-20
+MERGED from [com.android.support:support-media-compat:25.3.1] /Users/mdappo200/.android/build-cache/5561d9ddcba0819724a8e620d5e8f8fc0937475d/output/AndroidManifest.xml:29:5-20
+MERGED from [com.android.support:support-core-ui:25.3.1] /Users/mdappo200/.android/build-cache/4875b4b648f87b4902ed411d91368dde7bde5bef/output/AndroidManifest.xml:29:5-20
+MERGED from [com.android.support:support-core-utils:25.3.1] /Users/mdappo200/.android/build-cache/6bb9a792df607878a35e8a30e782df139272bb0e/output/AndroidManifest.xml:29:5-20
+MERGED from [com.android.support:animated-vector-drawable:25.3.1] /Users/mdappo200/.android/build-cache/ce59b47feca688820abcc08afe4ab30b460120df/output/AndroidManifest.xml:26:5-20
+MERGED from [com.android.support:support-vector-drawable:25.3.1] /Users/mdappo200/.android/build-cache/d27dbd0878cfdbc2e7e2a5e75590f93c1453d026/output/AndroidManifest.xml:26:5-20
+MERGED from [com.android.support:support-compat:25.3.1] /Users/mdappo200/.android/build-cache/e58ddfeb329ef649e099486f31b2e058c987c0a4/output/AndroidManifest.xml:29:5-20
+	android:label
+		ADDED from /Users/mdappo200/Projects/resourceprovider/sample/src/main/AndroidManifest.xml:8:7-39
+	android:allowBackup
+		ADDED from /Users/mdappo200/Projects/resourceprovider/sample/src/main/AndroidManifest.xml:7:7-33
+	android:icon
+		ADDED from /Users/mdappo200/Projects/resourceprovider/sample/src/main/AndroidManifest.xml:9:7-41
+	android:theme
+		ADDED from /Users/mdappo200/Projects/resourceprovider/sample/src/main/AndroidManifest.xml:10:7-65
+	android:name
+		ADDED from /Users/mdappo200/Projects/resourceprovider/sample/src/main/AndroidManifest.xml:6:7-71
+activity#com.xfinity.resourceprovider.sample.MainActivity
+ADDED from /Users/mdappo200/Projects/resourceprovider/sample/src/main/AndroidManifest.xml:12:5-19:16
+	android:name
+		ADDED from /Users/mdappo200/Projects/resourceprovider/sample/src/main/AndroidManifest.xml:12:15-78
+intent-filter#android.intent.action.MAIN+android.intent.category.DEFAULT+android.intent.category.LAUNCHER
+ADDED from /Users/mdappo200/Projects/resourceprovider/sample/src/main/AndroidManifest.xml:13:7-18:23
+action#android.intent.action.MAIN
+ADDED from /Users/mdappo200/Projects/resourceprovider/sample/src/main/AndroidManifest.xml:14:9-60
+	android:name
+		ADDED from /Users/mdappo200/Projects/resourceprovider/sample/src/main/AndroidManifest.xml:14:17-58
+category#android.intent.category.LAUNCHER
+ADDED from /Users/mdappo200/Projects/resourceprovider/sample/src/main/AndroidManifest.xml:16:9-68
+	android:name
+		ADDED from /Users/mdappo200/Projects/resourceprovider/sample/src/main/AndroidManifest.xml:16:19-66
+category#android.intent.category.DEFAULT
+ADDED from /Users/mdappo200/Projects/resourceprovider/sample/src/main/AndroidManifest.xml:17:9-67
+	android:name
+		ADDED from /Users/mdappo200/Projects/resourceprovider/sample/src/main/AndroidManifest.xml:17:19-65
+uses-sdk
+INJECTED from /Users/mdappo200/Projects/resourceprovider/sample/src/main/AndroidManifest.xml reason: use-sdk injection requested
+MERGED from [com.android.support:appcompat-v7:25.3.1] /Users/mdappo200/.android/build-cache/402999a5cd9f22c6bd4e11ee370ffd02f5a4df73/output/AndroidManifest.xml:21:5-23:78
+MERGED from [com.android.support:support-v4:25.3.1] /Users/mdappo200/.android/build-cache/296dfe257c854676f86d5b4582ce313c336e0e4b/output/AndroidManifest.xml:21:5-23:54
+MERGED from [com.android.support:support-fragment:25.3.1] /Users/mdappo200/.android/build-cache/cdbcb9ae9986ce96b43ff9d5dc0e2c5ecad14c10/output/AndroidManifest.xml:21:5-23:60
+MERGED from [com.android.support:support-media-compat:25.3.1] /Users/mdappo200/.android/build-cache/5561d9ddcba0819724a8e620d5e8f8fc0937475d/output/AndroidManifest.xml:21:5-23:63
+MERGED from [com.android.support:support-core-ui:25.3.1] /Users/mdappo200/.android/build-cache/4875b4b648f87b4902ed411d91368dde7bde5bef/output/AndroidManifest.xml:21:5-23:58
+MERGED from [com.android.support:support-core-utils:25.3.1] /Users/mdappo200/.android/build-cache/6bb9a792df607878a35e8a30e782df139272bb0e/output/AndroidManifest.xml:21:5-23:61
+MERGED from [com.android.support:animated-vector-drawable:25.3.1] /Users/mdappo200/.android/build-cache/ce59b47feca688820abcc08afe4ab30b460120df/output/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-vector-drawable:25.3.1] /Users/mdappo200/.android/build-cache/d27dbd0878cfdbc2e7e2a5e75590f93c1453d026/output/AndroidManifest.xml:20:5-43
+MERGED from [com.android.support:support-compat:25.3.1] /Users/mdappo200/.android/build-cache/e58ddfeb329ef649e099486f31b2e058c987c0a4/output/AndroidManifest.xml:21:5-23:58
+	tools:overrideLibrary
+		ADDED from [com.android.support:appcompat-v7:25.3.1] /Users/mdappo200/.android/build-cache/402999a5cd9f22c6bd4e11ee370ffd02f5a4df73/output/AndroidManifest.xml:23:9-75
+	android:targetSdkVersion
+		INJECTED from /Users/mdappo200/Projects/resourceprovider/sample/src/main/AndroidManifest.xml
+		INJECTED from /Users/mdappo200/Projects/resourceprovider/sample/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /Users/mdappo200/Projects/resourceprovider/sample/src/main/AndroidManifest.xml
+		INJECTED from /Users/mdappo200/Projects/resourceprovider/sample/src/main/AndroidManifest.xml
+meta-data#android.support.VERSION
+ADDED from [com.android.support:appcompat-v7:25.3.1] /Users/mdappo200/.android/build-cache/402999a5cd9f22c6bd4e11ee370ffd02f5a4df73/output/AndroidManifest.xml:25:5-27:34
+MERGED from [com.android.support:support-v4:25.3.1] /Users/mdappo200/.android/build-cache/296dfe257c854676f86d5b4582ce313c336e0e4b/output/AndroidManifest.xml:25:5-27:34
+MERGED from [com.android.support:support-fragment:25.3.1] /Users/mdappo200/.android/build-cache/cdbcb9ae9986ce96b43ff9d5dc0e2c5ecad14c10/output/AndroidManifest.xml:25:5-27:34
+MERGED from [com.android.support:support-media-compat:25.3.1] /Users/mdappo200/.android/build-cache/5561d9ddcba0819724a8e620d5e8f8fc0937475d/output/AndroidManifest.xml:25:5-27:34
+MERGED from [com.android.support:support-core-ui:25.3.1] /Users/mdappo200/.android/build-cache/4875b4b648f87b4902ed411d91368dde7bde5bef/output/AndroidManifest.xml:25:5-27:34
+MERGED from [com.android.support:support-core-utils:25.3.1] /Users/mdappo200/.android/build-cache/6bb9a792df607878a35e8a30e782df139272bb0e/output/AndroidManifest.xml:25:5-27:34
+MERGED from [com.android.support:animated-vector-drawable:25.3.1] /Users/mdappo200/.android/build-cache/ce59b47feca688820abcc08afe4ab30b460120df/output/AndroidManifest.xml:22:5-24:34
+MERGED from [com.android.support:support-vector-drawable:25.3.1] /Users/mdappo200/.android/build-cache/d27dbd0878cfdbc2e7e2a5e75590f93c1453d026/output/AndroidManifest.xml:22:5-24:34
+MERGED from [com.android.support:support-compat:25.3.1] /Users/mdappo200/.android/build-cache/e58ddfeb329ef649e099486f31b2e058c987c0a4/output/AndroidManifest.xml:25:5-27:34
+	android:value
+		ADDED from [com.android.support:appcompat-v7:25.3.1] /Users/mdappo200/.android/build-cache/402999a5cd9f22c6bd4e11ee370ffd02f5a4df73/output/AndroidManifest.xml:27:9-31
+	android:name
+		ADDED from [com.android.support:appcompat-v7:25.3.1] /Users/mdappo200/.android/build-cache/402999a5cd9f22c6bd4e11ee370ffd02f5a4df73/output/AndroidManifest.xml:26:9-47
