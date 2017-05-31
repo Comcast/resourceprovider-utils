@@ -18,6 +18,8 @@ public class MainActivity extends ActionBarActivity implements MainView {
     dateTextView = (TextView) findViewById(R.id.date_string);
 
     presenter = new MainPresenter(new ResourceProvider(getApplicationContext()));
+    presenter.setView(this);
+    presenter.present();
   }
 
   @Override
