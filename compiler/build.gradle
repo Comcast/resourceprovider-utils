@@ -1,35 +1,71 @@
 apply plugin: 'java'
-apply plugin: 'maven-publish'
+apply plugin: 'maven'
+apply plugin: 'signing'
 
 dependencies {
-  compile project (':library')
-  compile 'com.google.auto.service:auto-service:1.0-rc2'
-  compile 'com.squareup:javapoet:1.8.0'
-  compile files("${System.properties['java.home']}/../lib/tools.jar")
+    compile project(':library')
+    compile 'com.google.auto.service:auto-service:1.0-rc2'
+    compile 'com.squareup:javapoet:1.8.0'
+    compile files("${System.properties['java.home']}/../lib/tools.jar")
 }
 
-task sourceJar(type: Jar) {
-  from sourceSets.main.allJava
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from tasks.javadoc.destinationDir
 }
 
-publishing {
-  repositories {
-    maven {
-      url "$buildDir/repo"
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+}
+
+artifacts {
+    archives jar
+    archives javadocJar
+    archives sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: sonatypeUsername, password: sonatypePassword)
+            }
+
+            pom.project {
+                name "$rootProject.projectName Compiler"
+                packaging 'jar'
+                description 'Annotations Processor for Resource Provider, an MVP Resources API for Android'
+                artifactId "$rootProject.artifactPrefix-compiler"
+                url 'https://github.com/Comcast/resourceprovider'
+
+                scm {
+                    url 'scm:git@github.com:Comcast/resourceprovider.git'
+                    connection 'scm:git@github.com:Comcast/resourceprovider.git'
+                    developerConnection 'scm:git@github.com:Comcast/resourceprovider.git'
+                }
+
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution 'repo'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'dapp'
+                        name 'Mark Dappollone'
+                    }
+                }
+            }
+        }
     }
-  }
-
-  publications {
-    mavenJava(MavenPublication) {
-      groupId rootProject.groupId
-      artifactId "$rootProject.artifactPrefix-compiler"
-      version rootProject.publishVersion
-
-      from components.java
-
-      artifact sourceJar {
-        classifier "sources"
-      }
-    }
-  }
 }
