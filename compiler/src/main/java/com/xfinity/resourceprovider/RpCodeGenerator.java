@@ -1,5 +1,6 @@
 package com.xfinity.resourceprovider;
 
+import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
@@ -16,6 +17,7 @@ import static com.squareup.javapoet.TypeSpec.classBuilder;
 import static javax.lang.model.element.Modifier.FINAL;
 import static javax.lang.model.element.Modifier.PUBLIC;
 
+
 final class RpCodeGenerator {
     private List<String> rClassStringVars;
 
@@ -27,6 +29,10 @@ final class RpCodeGenerator {
         ClassName contextClassName = get("android.content", "Context");
         FieldSpec contextField = FieldSpec.builder(contextClassName, "context", Modifier.PRIVATE).build();
 
+        AnnotationSpec supressLint = AnnotationSpec.builder(ClassName.get("android.annotation", "SuppressLint"))
+                                                   .addMember("value", "$L", "{\"StringFormatInvalid\", \"StringFormatMatches\"}")
+                                                   .build();
+
         MethodSpec constructor = MethodSpec.constructorBuilder()
                                            .addModifiers(PUBLIC)
                                            .addParameter(contextClassName, "context")
@@ -36,7 +42,8 @@ final class RpCodeGenerator {
         TypeSpec.Builder classBuilder = classBuilder("ResourceProvider")
                 .addModifiers(PUBLIC)
                 .addField(contextField)
-                .addMethod(constructor);
+                .addMethod(constructor)
+                .addAnnotation(supressLint);
 
         for (String var : rClassStringVars) {
             StringBuilder getterSuffix = new StringBuilder(var);
@@ -53,13 +60,17 @@ final class RpCodeGenerator {
             TypeName objectVarArgsType = ArrayTypeName.get(Object[].class);
             ParameterSpec parameterSpec = ParameterSpec.builder(objectVarArgsType, "formatArgs").build();
 
-            classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix.toString())
-                                             .addModifiers(Modifier.PUBLIC)
-                                             .addParameter(parameterSpec)
-                                             .returns(String.class)
-                                             .addStatement("return context.getString(R.string." + var + ", formatArgs)")
-                                             .varargs(true)
-                                             .build());
+            try {
+                classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix.toString())
+                                                 .addModifiers(Modifier.PUBLIC)
+                                                 .addParameter(parameterSpec)
+                                                 .returns(String.class)
+                                                 .addStatement("return context.getString(R.string." + var + ", formatArgs)")
+                                                 .varargs(true)
+                                                 .build());
+            } catch (IllegalArgumentException e) {
+                System.out.println("\n\nResourceProvider Compiler Error: " + e.getMessage() + ".\n\nUnable to generate API for R.string." + var + "\n\n") ;
+            }
 
         }
 
