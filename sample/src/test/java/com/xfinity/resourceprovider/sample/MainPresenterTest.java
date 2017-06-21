@@ -13,7 +13,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class MainPresenterTest {
     private static final String FORMATTED_STRING = "formattedString";
     private static final String FIRST_HALF_OF_MONTH = "firstHalfOfMonth";
