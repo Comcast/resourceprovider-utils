@@ -26,6 +26,10 @@ import static javax.lang.model.SourceVersion.latestSupported;
 public class RpProcessor extends AbstractProcessor {
 
     private static final String ANNOTATION = "@" + RpApplication.class.getSimpleName();
+    private static final String R_CLASS_IDENTIFIER = ".R";
+    private static final String STRING = "string";
+    private static final String PLURALS = "plurals";
+    private static final String ANDROID_APP_CLASS_TYPE = "android.app.Application";
 
     private final Messager messager = new Messager();
 
@@ -56,10 +60,11 @@ public class RpProcessor extends AbstractProcessor {
             }
 
             try {
-                List<String> rClassVars = new ArrayList<>();
+                List<String> rStringVars = new ArrayList<>();
+                List<String> rPluralVars = new ArrayList<>();
                 //lame.  this assumes that the application class is at the top level.  find a better way.
                 String packageName = getPackageName(processingEnv.getElementUtils(), annotatedClass);
-                String rClassName = packageName + ".R";
+                String rClassName = packageName + R_CLASS_IDENTIFIER;
 
                 roundEnv.getRootElements().stream().filter(element -> element instanceof TypeElement).forEach(element -> {
                     TypeElement typeElement = (TypeElement) element;
@@ -67,17 +72,23 @@ public class RpProcessor extends AbstractProcessor {
                         element.getEnclosedElements().stream()
                                .filter(enclosedElement -> enclosedElement instanceof TypeElement)
                                .forEach(enclosedElement -> {
-                                   if (enclosedElement.getSimpleName().toString().equals("string")) {
-                                       List<? extends Element> enclosedStringElements = enclosedElement.getEnclosedElements();
-                                       enclosedStringElements.stream()
-                                                             .filter(stringElement -> stringElement instanceof Symbol.VarSymbol)
-                                                             .forEach(stringElement -> rClassVars.add(stringElement.toString()));
+                                   List<? extends Element> enclosedElements = enclosedElement.getEnclosedElements();
+                                   if (enclosedElement.getSimpleName().toString().equals(STRING)) {
+                                       enclosedElements.stream()
+                                                       .filter(stringElement -> stringElement instanceof Symbol.VarSymbol)
+                                                       .forEach(stringElement -> rStringVars.add(stringElement.toString()));
+                                   }
+
+                                   if (enclosedElement.getSimpleName().toString().equals(PLURALS)) {
+                                       enclosedElements.stream()
+                                                       .filter(pluralsElement -> pluralsElement instanceof Symbol.VarSymbol)
+                                                       .forEach(pluralsElement -> rPluralVars.add(pluralsElement.toString()));
                                    }
                                });
                     }
                 });
 
-                generateCode(annotatedClass, rClassVars);
+                generateCode(annotatedClass, rStringVars, rPluralVars);
             } catch (UnnamedPackageException | IOException e) {
                 messager.error(annotatedElement, "Couldn't generate class for %s: %s", annotatedClass,
                                e.getMessage());
@@ -88,14 +99,14 @@ public class RpProcessor extends AbstractProcessor {
     }
 
     private boolean isValidClass(TypeElement annotatedClass) {
-        TypeElement applicationTypeElement = processingEnv.getElementUtils().getTypeElement("android.app.Application");
+        TypeElement applicationTypeElement = processingEnv.getElementUtils().getTypeElement(ANDROID_APP_CLASS_TYPE);
         return processingEnv.getTypeUtils().isAssignable(annotatedClass.asType(), applicationTypeElement.asType());
     }
 
-    private void generateCode(TypeElement annotatedClass, List<String> rClassVars)
+    private void generateCode(TypeElement annotatedClass, List<String> rStringVars, List<String> rPluralVars)
             throws UnnamedPackageException, IOException {
         String packageName = getPackageName(processingEnv.getElementUtils(), annotatedClass);
-        RpCodeGenerator codeGenerator = new RpCodeGenerator(rClassVars);
+        RpCodeGenerator codeGenerator = new RpCodeGenerator(rStringVars, rPluralVars);
         TypeSpec generatedClass = codeGenerator.generateClass();
 
         JavaFile javaFile = builder(packageName, generatedClass).build();

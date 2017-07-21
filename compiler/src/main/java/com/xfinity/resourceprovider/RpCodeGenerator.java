@@ -13,6 +13,7 @@ import javax.lang.model.element.Modifier;
 import java.util.List;
 
 import static com.squareup.javapoet.ClassName.get;
+import static com.squareup.javapoet.TypeName.INT;
 import static com.squareup.javapoet.TypeSpec.classBuilder;
 import static javax.lang.model.element.Modifier.FINAL;
 import static javax.lang.model.element.Modifier.PUBLIC;
@@ -20,9 +21,11 @@ import static javax.lang.model.element.Modifier.PUBLIC;
 
 final class RpCodeGenerator {
     private List<String> rClassStringVars;
+    private List<String> rClassPluralVars;
 
-    RpCodeGenerator(List<String> rClassStringVars) {
+    RpCodeGenerator(List<String> rClassStringVars, List<String> rClassPluralVars) {
         this.rClassStringVars = rClassStringVars;
+        this.rClassPluralVars = rClassPluralVars;
     }
 
     TypeSpec generateClass() {
@@ -46,22 +49,11 @@ final class RpCodeGenerator {
                 .addAnnotation(supressLint);
 
         for (String var : rClassStringVars) {
-            StringBuilder getterSuffix = new StringBuilder(var);
-            getterSuffix.setCharAt(0, Character.toUpperCase(getterSuffix.charAt(0)));
-
-            int i;
-            while ((i = getterSuffix.indexOf("_")) != -1) {
-                char old = getterSuffix.charAt(i + 1);
-                char newChar = Character.toUpperCase(old);
-                getterSuffix.setCharAt(i + 1, newChar);
-                getterSuffix.deleteCharAt(i);
-            }
-
             TypeName objectVarArgsType = ArrayTypeName.get(Object[].class);
             ParameterSpec parameterSpec = ParameterSpec.builder(objectVarArgsType, "formatArgs").build();
 
             try {
-                classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix.toString())
+                classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix(var))
                                                  .addModifiers(Modifier.PUBLIC)
                                                  .addParameter(parameterSpec)
                                                  .returns(String.class)
@@ -74,6 +66,41 @@ final class RpCodeGenerator {
 
         }
 
+        for (String var : rClassPluralVars) {
+            TypeName objectVarArgsType = ArrayTypeName.get(Object[].class);
+            ParameterSpec formatArgsParameterSpec = ParameterSpec.builder(objectVarArgsType, "formatArgs").build();
+            ParameterSpec quantityParameterSpec = ParameterSpec.builder(INT, "quantity").build();
+
+            try {
+                classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix(var) + "QuantityString")
+                                                 .addModifiers(Modifier.PUBLIC)
+                                                 .addParameter(quantityParameterSpec)
+                                                 .addParameter(formatArgsParameterSpec)
+                                                 .returns(String.class)
+                                                 .addStatement("return context.getResources().getQuantityString(R.plurals." + var + ", quantity, formatArgs)")
+                                                 .varargs(true)
+                                                 .build());
+            } catch (IllegalArgumentException e) {
+                System.out.println("\n\nResourceProvider Compiler Error: " + e.getMessage() + ".\n\nUnable to generate API for R.plurals." + var + "\n\n") ;
+            }
+
+        }
+
         return classBuilder.build();
+    }
+
+    private String getterSuffix(String varName) {
+        StringBuilder getterSuffix = new StringBuilder(varName);
+        getterSuffix.setCharAt(0, Character.toUpperCase(getterSuffix.charAt(0)));
+
+        int i;
+        while ((i = getterSuffix.indexOf("_")) != -1) {
+            char old = getterSuffix.charAt(i + 1);
+            char newChar = Character.toUpperCase(old);
+            getterSuffix.setCharAt(i + 1, newChar);
+            getterSuffix.deleteCharAt(i);
+        }
+
+        return getterSuffix.toString();
     }
 }
