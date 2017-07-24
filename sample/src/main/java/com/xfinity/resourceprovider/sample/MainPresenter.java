@@ -2,22 +2,22 @@ package com.xfinity.resourceprovider.sample;
 
 import java.util.Calendar;
 
-public class MainPresenter {
+class MainPresenter {
     private static final int FORMAT_ARG = 10000;
     private static final int MONTH_HALFWAY_POINT = 15;
 
     private final ResourceProvider resourceProvider;
     private MainView mainView;
 
-    public MainPresenter(ResourceProvider resourceProvider) {
+    MainPresenter(ResourceProvider resourceProvider) {
         this.resourceProvider = resourceProvider;
     }
     
-    public void setView(MainView mainView) {
+    void setView(MainView mainView) {
         this.mainView = mainView;
     }
 
-    public void present() {
+    void present() {
         mainView.setFormattedText(resourceProvider.getOneArgFormattedString(FORMAT_ARG));
 
         Calendar today = Calendar.getInstance();
@@ -25,6 +25,14 @@ public class MainPresenter {
             mainView.setDateString(resourceProvider.getSecondHalfOfMonth());
         } else {
             mainView.setDateString(resourceProvider.getFirstHalfOfMonth());
+        }
+
+        int dayOfWeek = today.get(Calendar.DAY_OF_WEEK);
+        int daysUntilFriday = Calendar.FRIDAY - dayOfWeek;
+        if (daysUntilFriday >= 0) {
+            mainView.setPluralsString(resourceProvider.getDaysUntilFridayQuantityString(daysUntilFriday, daysUntilFriday));
+        } else {
+            mainView.setPluralsString(resourceProvider.getSaturday());
         }
     }
 }
