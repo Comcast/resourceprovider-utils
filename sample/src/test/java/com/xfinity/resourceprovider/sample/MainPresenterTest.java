@@ -1,5 +1,7 @@
 package com.xfinity.resourceprovider.sample;
 
+import android.graphics.drawable.Drawable;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,6 +23,7 @@ public class MainPresenterTest {
 
     @Mock MainView mainView;
     @Mock ResourceProvider resourceProvider;
+    @Mock Drawable drawable;
 
     private MainPresenter presenter;
 
@@ -31,10 +34,18 @@ public class MainPresenterTest {
         when(resourceProvider.getOneArgFormattedString(anyInt())).thenReturn(FORMATTED_STRING);
         when(resourceProvider.getFirstHalfOfMonth()).thenReturn(FIRST_HALF_OF_MONTH);
         when(resourceProvider.getSecondHalfOfMonth()).thenReturn(SECOND_HALF_OF_MONTH);
+        when(resourceProvider.getIcnNavDino()).thenReturn(drawable);
 
         presenter = new MainPresenter(resourceProvider);
     }
 
+    @Test
+    public void drawable_presents_correctly() {
+        presenter.setView(mainView);
+        presenter.present();
+        verify(resourceProvider).getIcnNavDino();
+        verify(mainView).setDrawable(drawable);
+    }
 
     @Test
     public void formatted_text_presents_correctly() {
