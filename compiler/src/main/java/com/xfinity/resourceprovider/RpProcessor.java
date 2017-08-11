@@ -5,6 +5,11 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
 import com.sun.tools.javac.code.Symbol;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
@@ -12,10 +17,6 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 import static com.squareup.javapoet.JavaFile.builder;
 import static com.xfinity.resourceprovider.Utils.getPackageName;
@@ -29,6 +30,7 @@ public class RpProcessor extends AbstractProcessor {
     private static final String R_CLASS_IDENTIFIER = ".R";
     private static final String STRING = "string";
     private static final String PLURALS = "plurals";
+    private static final String DRAWABLE = "drawable";
     private static final String ANDROID_APP_CLASS_TYPE = "android.app.Application";
 
     private final Messager messager = new Messager();
@@ -62,6 +64,7 @@ public class RpProcessor extends AbstractProcessor {
             try {
                 List<String> rStringVars = new ArrayList<>();
                 List<String> rPluralVars = new ArrayList<>();
+                List<String> rDrawablevars = new ArrayList<>();
                 //lame.  this assumes that the application class is at the top level.  find a better way.
                 String packageName = getPackageName(processingEnv.getElementUtils(), annotatedClass);
                 String rClassName = packageName + R_CLASS_IDENTIFIER;
@@ -84,11 +87,17 @@ public class RpProcessor extends AbstractProcessor {
                                                        .filter(pluralsElement -> pluralsElement instanceof Symbol.VarSymbol)
                                                        .forEach(pluralsElement -> rPluralVars.add(pluralsElement.toString()));
                                    }
+
+                                   if (enclosedElement.getSimpleName().toString().equals(DRAWABLE)) {
+                                       enclosedElements.stream()
+                                               .filter(drawableElement -> drawableElement instanceof Symbol.VarSymbol)
+                                               .forEach(drawableElement -> rDrawablevars.add(drawableElement.toString()));
+                                   }
                                });
                     }
                 });
 
-                generateCode(annotatedClass, rStringVars, rPluralVars);
+                generateCode(annotatedClass, rStringVars, rPluralVars, rDrawablevars);
             } catch (UnnamedPackageException | IOException e) {
                 messager.error(annotatedElement, "Couldn't generate class for %s: %s", annotatedClass,
                                e.getMessage());
@@ -103,12 +112,11 @@ public class RpProcessor extends AbstractProcessor {
         return processingEnv.getTypeUtils().isAssignable(annotatedClass.asType(), applicationTypeElement.asType());
     }
 
-    private void generateCode(TypeElement annotatedClass, List<String> rStringVars, List<String> rPluralVars)
+    private void generateCode(TypeElement annotatedClass, List<String> rStringVars, List<String> rPluralVars, List<String> rDrawableVars)
             throws UnnamedPackageException, IOException {
         String packageName = getPackageName(processingEnv.getElementUtils(), annotatedClass);
-        RpCodeGenerator codeGenerator = new RpCodeGenerator(rStringVars, rPluralVars);
+        RpCodeGenerator codeGenerator = new RpCodeGenerator(rStringVars, rPluralVars, rDrawableVars);
         TypeSpec generatedClass = codeGenerator.generateClass();
-
         JavaFile javaFile = builder(packageName, generatedClass).build();
         javaFile.writeTo(processingEnv.getFiler());
     }
