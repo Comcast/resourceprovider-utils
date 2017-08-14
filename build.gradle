@@ -14,7 +14,7 @@ allprojects {
     }
 
     group = 'com.xfinity'
-    version = '0.6'
+    version = '0.7'
 }
 
 ext {
@@ -22,6 +22,6 @@ ext {
     artifactPrefix = 'resourceprovider'
     groupId = 'com.xfinity'
     uploadName = 'Resource-Provider'
-    publishVersion = '0.5'
+    publishVersion = '0.7'
     description = 'First cut at a generated resource provider abstraction'
 }
