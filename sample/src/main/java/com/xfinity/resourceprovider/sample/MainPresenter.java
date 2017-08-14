@@ -34,5 +34,7 @@ class MainPresenter {
         } else {
             mainView.setPluralsString(resourceProvider.getSaturday());
         }
+
+        mainView.setDrawable(resourceProvider.getIcnNavDino());
     }
 }
