@@ -21,7 +21,34 @@ A Java annotation processor that builds a ResourceProvider class which contains 
    The resourceprovider-compiler will generate the API:
    
    ```java
-   public String getOneArgFormattedString(Object... formatArgs)
+   public String getOneArgFormattedString(Object... formatArgs) { ... }
+   ```
+   
+   For any plural:
+   
+   ```xml
+   <plurals name="days_until_friday">
+        <item quantity="one">Only 1 day until Friday!</item>
+        <item quantity="other">%d days until Friday</item>
+   </plurals>
+   ```
+  
+   resourceprovider-compiler will generate the API:
+   
+   ```Java
+   public String getDaysUntilFridayQuantityString(int quantity, Object... formatArgs) { ... }
+   ```
+   
+   And for any drawable file
+   
+   ```xml
+    any_drawable.png ( or any_drawable.xml)
+   ```
+
+   The resourceprovider-compiler will generate the API:
+   
+   ```java
+   public Drawable getAnyDrawable() { ... } 
    ```
    
   Setup
@@ -46,5 +73,13 @@ A Java annotation processor that builds a ResourceProvider class which contains 
    ```xml
    kapt "com.xfinity:resourceprovider-compiler:<version>"
    ``` 
+   Also, when using kapt, don't forget to include 
+   
+   ```xml
+   kapt {
+    correctErrorTypes = true
+   }
+   ```
+   For compatibility with other annotation processors, like Dagger
    
    This library used the https://github.com/jenzz/Android-StaticLauncher project as a template. 
