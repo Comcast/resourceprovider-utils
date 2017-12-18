@@ -37,5 +37,6 @@ class MainPresenter {
 
         mainView.setDrawable(resourceProvider.getIcnNavDino());
         mainView.setDimenText("The Test Dimen is " + resourceProvider.getTestDimenPixelSize() + " in pixels");
+        mainView.setIntegerText("The Test Integer is " + resourceProvider.getTestInteger());
     }
 }

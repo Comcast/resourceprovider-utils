@@ -32,6 +32,7 @@ public class RpProcessor extends AbstractProcessor {
     private static final String PLURALS = "plurals";
     private static final String DRAWABLE = "drawable";
     private static final String DIMEN = "dimen";
+    private static final String INTEGER = "integer";
     private static final String ANDROID_APP_CLASS_TYPE = "android.app.Application";
 
     private final Messager messager = new Messager();
@@ -67,6 +68,8 @@ public class RpProcessor extends AbstractProcessor {
                 List<String> rPluralVars = new ArrayList<>();
                 List<String> rDrawablevars = new ArrayList<>();
                 List<String> rDimenVars = new ArrayList<>();
+                List<String> rIntegerVars = new ArrayList<>();
+
                 //lame.  this assumes that the application class is at the top level.  find a better way.
                 String packageName = getPackageName(processingEnv.getElementUtils(), annotatedClass);
                 String rClassName = packageName + R_CLASS_IDENTIFIER;
@@ -101,11 +104,17 @@ public class RpProcessor extends AbstractProcessor {
                                                        .filter(dimenElement -> dimenElement instanceof Symbol.VarSymbol)
                                                        .forEach(dimenElement -> rDimenVars.add(dimenElement.toString()));
                                    }
+
+                                   if (enclosedElement.getSimpleName().toString().equals(INTEGER)) {
+                                       enclosedElements.stream()
+                                                       .filter(integerElement -> integerElement instanceof Symbol.VarSymbol)
+                                                       .forEach(integerElement -> rIntegerVars.add(integerElement.toString()));
+                                   }
                                });
                     }
                 });
 
-                generateCode(annotatedClass, rStringVars, rPluralVars, rDrawablevars, rDimenVars);
+                generateCode(annotatedClass, rStringVars, rPluralVars, rDrawablevars, rDimenVars, rIntegerVars);
             } catch (UnnamedPackageException | IOException e) {
                 messager.error(annotatedElement, "Couldn't generate class for %s: %s", annotatedClass,
                                e.getMessage());
@@ -121,10 +130,10 @@ public class RpProcessor extends AbstractProcessor {
     }
 
     private void generateCode(TypeElement annotatedClass, List<String> rStringVars, List<String> rPluralVars,
-                              List<String> rDrawableVars, List<String> rDimenVars)
+                              List<String> rDrawableVars, List<String> rDimenVars, List<String> rIntegerVars)
             throws UnnamedPackageException, IOException {
         String packageName = getPackageName(processingEnv.getElementUtils(), annotatedClass);
-        RpCodeGenerator codeGenerator = new RpCodeGenerator(rStringVars, rPluralVars, rDrawableVars, rDimenVars);
+        RpCodeGenerator codeGenerator = new RpCodeGenerator(rStringVars, rPluralVars, rDrawableVars, rDimenVars, rIntegerVars);
         TypeSpec generatedClass = codeGenerator.generateClass();
         JavaFile javaFile = builder(packageName, generatedClass).build();
         javaFile.writeTo(processingEnv.getFiler());

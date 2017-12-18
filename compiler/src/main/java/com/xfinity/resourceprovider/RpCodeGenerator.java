@@ -23,14 +23,15 @@ final class RpCodeGenerator {
     private List<String> rClassPluralVars;
     private List<String> rDrawableVars;
     private List<String> rDimenVars;
+    private List<String> rIntegerVars;
 
     RpCodeGenerator(List<String> rClassStringVars, List<String> rClassPluralVars, List<String> rDrawableVars,
-                    List<String> rDimenVars) {
+                    List<String> rDimenVars, List<String> rIntegerVars) {
         this.rClassStringVars = rClassStringVars;
         this.rClassPluralVars = rClassPluralVars;
         this.rDrawableVars = rDrawableVars;
         this.rDimenVars = rDimenVars;
-
+        this.rIntegerVars = rIntegerVars;
     }
 
     TypeSpec generateClass() {
@@ -121,6 +122,21 @@ final class RpCodeGenerator {
             }
 
         }
+
+        for (String var : rIntegerVars) {
+            try {
+                classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix(var))
+                                                 .addModifiers(Modifier.PUBLIC)
+                                                 .returns(INT)
+                                                 .addStatement("return context.getResources().getInteger(R.integer." + var + ")")
+                                                 .varargs(false)
+                                                 .build());
+            } catch (IllegalArgumentException e) {
+                System.out.println("\n\nResourceProvider Compiler Error: " + e.getMessage() + ".\n\nUnable to generate API for R.int." + var + "\n\n") ;
+            }
+
+        }
+
 
 
         return classBuilder.build();
