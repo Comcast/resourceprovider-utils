@@ -10,6 +10,8 @@ public class MainActivity extends ActionBarActivity implements MainView {
   private TextView formatedTextView;
   private TextView dateTextView;
   private TextView pluralsView;
+  private TextView dimenView;
+  private TextView integerView;
   private ImageView imageView;
 
   @Override
@@ -21,6 +23,8 @@ public class MainActivity extends ActionBarActivity implements MainView {
     dateTextView = (TextView) findViewById(R.id.date_string);
     pluralsView = (TextView) findViewById(R.id.plurals_string);
     imageView = (ImageView) findViewById(R.id.image);
+    dimenView = (TextView) findViewById(R.id.dimen_text);
+    integerView = (TextView) findViewById(R.id.integer_text);
 
     MainPresenter presenter = new MainPresenter(new ResourceProvider(getApplicationContext()));
     presenter.setView(this);
@@ -45,5 +49,15 @@ public class MainActivity extends ActionBarActivity implements MainView {
   @Override
   public void setDrawable(Drawable drawable) {
     imageView.setImageDrawable(drawable);
+  }
+
+  @Override
+  public void setDimenText(String dimenText) {
+    dimenView.setText(dimenText);
+  }
+
+  @Override
+  public void setIntegerText(String integerText) {
+    integerView.setText(integerText);
   }
 }
