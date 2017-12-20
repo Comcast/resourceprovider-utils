@@ -10,7 +10,6 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import javax.lang.model.element.Modifier;
-import java.lang.annotation.Annotation;
 import java.util.List;
 
 import static com.squareup.javapoet.ClassName.get;
@@ -20,44 +19,90 @@ import static javax.lang.model.element.Modifier.PUBLIC;
 
 
 final class RpCodeGenerator {
+    private final String packageName;
     private List<String> rClassStringVars;
     private List<String> rClassPluralVars;
-    private List<String> rDrawableVars;
-    private List<String> rDimenVars;
-    private List<String> rIntegerVars;
-    private List<String> rColorVars;
+    private List<String> rClassDrawableVars;
+    private List<String> rClassDimenVars;
+    private List<String> rClassIntegerVars;
+    private List<String> rClassColorVars;
 
-    RpCodeGenerator(List<String> rClassStringVars, List<String> rClassPluralVars, List<String> rDrawableVars,
-                    List<String> rDimenVars, List<String> rIntegerVars, List<String> rColorVars) {
+    private final ClassName contextClassName = get("android.content", "Context");
+    private final FieldSpec contextField = FieldSpec.builder(contextClassName, "context", Modifier.PRIVATE).build();
+    private final AnnotationSpec suppressLint = AnnotationSpec.builder(ClassName.get("android.annotation", "SuppressLint"))
+                                               .addMember("value", "$L", "{\"StringFormatInvalid\", \"StringFormatMatches\"}")
+                                               .build();
+    private TypeName contextCompatClassName = get("android.support.v4.content", "ContextCompat");
+
+    RpCodeGenerator(String packageName, List<String> rClassStringVars, List<String> rClassPluralVars, List<String> rClassDrawableVars,
+                    List<String> rClassDimenVars, List<String> rClassIntegerVars, List<String> rClassColorVars) {
+        this.packageName = packageName;
         this.rClassStringVars = rClassStringVars;
         this.rClassPluralVars = rClassPluralVars;
-        this.rDrawableVars = rDrawableVars;
-        this.rDimenVars = rDimenVars;
-        this.rIntegerVars = rIntegerVars;
-        this.rColorVars = rColorVars;
+        this.rClassDrawableVars = rClassDrawableVars;
+        this.rClassDimenVars = rClassDimenVars;
+        this.rClassIntegerVars = rClassIntegerVars;
+        this.rClassColorVars = rClassColorVars;
     }
 
-    TypeSpec generateClass() {
-        ClassName contextClassName = get("android.content", "Context");
-        FieldSpec contextField = FieldSpec.builder(contextClassName, "context", Modifier.PRIVATE).build();
-        ClassName drawableClassName = get("android.graphics.drawable", "Drawable");
-        TypeName contextCompatClassName = get("android.support.v4.content", "ContextCompat");
+    TypeSpec generateResourceProviderClass() {
+        MethodSpec constructor = MethodSpec.constructorBuilder()
+                                           .addModifiers(PUBLIC)
+                                           .addParameter(contextClassName, "context")
+                                           .addStatement("this.context = context")
+                                           .addStatement("this.string = new StringProvider(context)")
+                                           .addStatement("this.drawable = new DrawableProvider(context)")
+                                           .addStatement("this.color = new ColorProvider(context)")
+                                           .addStatement("this.dimen = new DimensionProvider(context)")
+                                           .addStatement("this.integer = new IntegerProvider(context)")
+                                           .build();
 
-        AnnotationSpec supressLint = AnnotationSpec.builder(ClassName.get("android.annotation", "SuppressLint"))
-                                                   .addMember("value", "$L", "{\"StringFormatInvalid\", \"StringFormatMatches\"}")
-                                                   .build();
+        ClassName stringProviderClassName = get(packageName, "StringProvider");
+        FieldSpec stringProvider = FieldSpec.builder(stringProviderClassName, "string")
+                                            .addModifiers(Modifier.PUBLIC, Modifier.FINAL).build();
 
+        ClassName drawableProviderClassName = get(packageName, "DrawableProvider");
+        FieldSpec drawableProvider = FieldSpec.builder(drawableProviderClassName, "drawable")
+                                              .addModifiers(Modifier.PUBLIC, Modifier.FINAL).build();
+
+        ClassName colorProviderClassName = get(packageName, "ColorProvider");
+        FieldSpec colorProvider = FieldSpec.builder(colorProviderClassName, "color")
+                                           .addModifiers(Modifier.PUBLIC, Modifier.FINAL).build();
+
+        ClassName dimenProviderClassName = get(packageName, "DimensionProvider");
+        FieldSpec dimenProvider = FieldSpec.builder(dimenProviderClassName, "dimen")
+                                           .addModifiers(Modifier.PUBLIC, Modifier.FINAL).build();
+
+        ClassName integerProviderClassName = get(packageName, "IntegerProvider");
+        FieldSpec integerProvider = FieldSpec.builder(integerProviderClassName, "integer")
+                                             .addModifiers(Modifier.PUBLIC, Modifier.FINAL).build();
+
+
+        TypeSpec.Builder classBuilder = classBuilder("ResourceProvider")
+                .addModifiers(PUBLIC)
+                .addField(contextField)
+                .addMethod(constructor)
+                .addField(stringProvider)
+                .addField(drawableProvider)
+                .addField(colorProvider)
+                .addField(dimenProvider)
+                .addField(integerProvider);
+
+        return classBuilder.build();
+    }
+
+    TypeSpec generateStringProviderClass() {
         MethodSpec constructor = MethodSpec.constructorBuilder()
                                            .addModifiers(PUBLIC)
                                            .addParameter(contextClassName, "context")
                                            .addStatement("this.context = context")
                                            .build();
 
-        TypeSpec.Builder classBuilder = classBuilder("ResourceProvider")
+        TypeSpec.Builder classBuilder = classBuilder("StringProvider")
                 .addModifiers(PUBLIC)
                 .addField(contextField)
                 .addMethod(constructor)
-                .addAnnotation(supressLint);
+                .addAnnotation(suppressLint);
 
         for (String var : rClassStringVars) {
             TypeName objectVarArgsType = ArrayTypeName.get(Object[].class);
@@ -97,21 +142,54 @@ final class RpCodeGenerator {
 
         }
 
-        for (String var : rDrawableVars) {
+        return classBuilder.build();
+    }
+
+    TypeSpec generateDrawableProviderClass() {
+        ClassName drawableClassName = get("android.graphics.drawable", "Drawable");
+        MethodSpec constructor = MethodSpec.constructorBuilder()
+                                           .addModifiers(PUBLIC)
+                                           .addParameter(contextClassName, "context")
+                                           .addStatement("this.context = context")
+                                           .build();
+
+        TypeSpec.Builder classBuilder = classBuilder("DrawableProvider")
+                .addModifiers(PUBLIC)
+                .addField(contextField)
+                .addMethod(constructor)
+                .addAnnotation(suppressLint);
+
+        for (String var : rClassDrawableVars) {
             try {
                 classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix(var))
-                        .addModifiers(Modifier.PUBLIC)
-                        .returns(drawableClassName)
-                        .addStatement("return $T.getDrawable(context, R.drawable." + var + ")", contextCompatClassName)
-                        .varargs(false)
-                        .build());
+                                                 .addModifiers(Modifier.PUBLIC)
+                                                 .returns(drawableClassName)
+                                                 .addStatement("return $T.getDrawable(context, R.drawable." + var + ")", contextCompatClassName)
+                                                 .varargs(false)
+                                                 .build());
             } catch (IllegalArgumentException e) {
                 System.out.println("\n\nResourceProvider Compiler Error: " + e.getMessage() + ".\n\nUnable to generate API for R.drawable." + var + "\n\n") ;
             }
 
         }
 
-        for (String var : rColorVars) {
+        return classBuilder.build();
+    }
+
+    TypeSpec generateColorProviderClass() {
+        MethodSpec constructor = MethodSpec.constructorBuilder()
+                                           .addModifiers(PUBLIC)
+                                           .addParameter(contextClassName, "context")
+                                           .addStatement("this.context = context")
+                                           .build();
+
+        TypeSpec.Builder classBuilder = classBuilder("ColorProvider")
+                .addModifiers(PUBLIC)
+                .addField(contextField)
+                .addMethod(constructor)
+                .addAnnotation(suppressLint);
+
+        for (String var : rClassColorVars) {
             try {
                 classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix(var))
                                                  .addModifiers(Modifier.PUBLIC)
@@ -124,22 +202,24 @@ final class RpCodeGenerator {
             }
         }
 
-        for (String var : rDimenVars) {
-            try {
-                classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix(var) + "PixelSize")
-                                                 .addModifiers(Modifier.PUBLIC)
-                                                 .returns(INT)
-                                                 .addStatement("return context.getResources().getDimensionPixelSize(R.dimen." + var + ")")
-                                                 .varargs(false)
-                                                 .addJavadoc("Returns the dimension R.dimen." + var + " in pixels")
-                                                 .build());
-            } catch (IllegalArgumentException e) {
-                System.out.println("\n\nResourceProvider Compiler Error: " + e.getMessage() + ".\n\nUnable to generate API for R.dimen." + var + "\n\n") ;
-            }
+        return classBuilder.build();
+    }
 
-        }
+    TypeSpec generateIntegerProviderClass() {
+        MethodSpec constructor = MethodSpec.constructorBuilder()
+                                           .addModifiers(PUBLIC)
+                                           .addParameter(contextClassName, "context")
+                                           .addStatement("this.context = context")
+                                           .build();
 
-        for (String var : rIntegerVars) {
+        TypeSpec.Builder classBuilder = classBuilder("IntegerProvider")
+                .addModifiers(PUBLIC)
+                .addField(contextField)
+                .addMethod(constructor)
+                .addAnnotation(suppressLint);
+
+
+        for (String var : rClassIntegerVars) {
             try {
                 classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix(var))
                                                  .addModifiers(Modifier.PUBLIC)
@@ -153,6 +233,38 @@ final class RpCodeGenerator {
         }
 
 
+
+        return classBuilder.build();
+    }
+
+    TypeSpec generateDimensionProviderClass() {
+        MethodSpec constructor = MethodSpec.constructorBuilder()
+                                           .addModifiers(PUBLIC)
+                                           .addParameter(contextClassName, "context")
+                                           .addStatement("this.context = context")
+                                           .build();
+
+        TypeSpec.Builder classBuilder = classBuilder("DimensionProvider")
+                .addModifiers(PUBLIC)
+                .addField(contextField)
+                .addMethod(constructor)
+                .addAnnotation(suppressLint);
+
+
+        for (String var : rClassDimenVars) {
+            try {
+                classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix(var) + "PixelSize")
+                                                 .addModifiers(Modifier.PUBLIC)
+                                                 .returns(INT)
+                                                 .addStatement("return context.getResources().getDimensionPixelSize(R.dimen." + var + ")")
+                                                 .varargs(false)
+                                                 .addJavadoc("Returns the dimension R.dimen." + var + " in pixels")
+                                                 .build());
+            } catch (IllegalArgumentException e) {
+                System.out.println("\n\nResourceProvider Compiler Error: " + e.getMessage() + ".\n\nUnable to generate API for R.dimen." + var + "\n\n") ;
+            }
+
+        }
 
         return classBuilder.build();
     }
