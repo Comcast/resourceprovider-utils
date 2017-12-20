@@ -2,29 +2,32 @@ package com.xfinity.resourceprovider.sample;
 
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class MainActivity extends ActionBarActivity implements MainView {
-  private TextView formatedTextView;
+public class MainActivity extends AppCompatActivity implements MainView {
+  private TextView formattedTextView;
   private TextView dateTextView;
   private TextView pluralsView;
   private TextView dimenView;
   private TextView integerView;
   private ImageView imageView;
+  private View colorView;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
-    formatedTextView = (TextView) findViewById(R.id.formatted_text_view);
-    dateTextView = (TextView) findViewById(R.id.date_string);
-    pluralsView = (TextView) findViewById(R.id.plurals_string);
-    imageView = (ImageView) findViewById(R.id.image);
-    dimenView = (TextView) findViewById(R.id.dimen_text);
-    integerView = (TextView) findViewById(R.id.integer_text);
+    formattedTextView = findViewById(R.id.formatted_text_view);
+    dateTextView = findViewById(R.id.date_string);
+    pluralsView = findViewById(R.id.plurals_string);
+    imageView = findViewById(R.id.image);
+    dimenView = findViewById(R.id.dimen_text);
+    integerView = findViewById(R.id.integer_text);
+    colorView = findViewById(R.id.color_view);
 
     MainPresenter presenter = new MainPresenter(new ResourceProvider(getApplicationContext()));
     presenter.setView(this);
@@ -33,7 +36,7 @@ public class MainActivity extends ActionBarActivity implements MainView {
 
   @Override
   public void setFormattedText(String formattedText) {
-    formatedTextView.setText(formattedText);
+    formattedTextView.setText(formattedText);
   }
 
   @Override
@@ -59,5 +62,10 @@ public class MainActivity extends ActionBarActivity implements MainView {
   @Override
   public void setIntegerText(String integerText) {
     integerView.setText(integerText);
+  }
+
+  @Override
+  public void setColorViewBackgroundColor(int color) {
+    colorView.setBackgroundColor(color);
   }
 }
