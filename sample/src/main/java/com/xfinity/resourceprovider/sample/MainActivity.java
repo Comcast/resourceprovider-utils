@@ -3,6 +3,7 @@ package com.xfinity.resourceprovider.sample;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -13,6 +14,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
   private TextView dimenView;
   private TextView integerView;
   private ImageView imageView;
+  private View colorView;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
     imageView = findViewById(R.id.image);
     dimenView = findViewById(R.id.dimen_text);
     integerView = findViewById(R.id.integer_text);
+    colorView = findViewById(R.id.color_view);
 
     MainPresenter presenter = new MainPresenter(new ResourceProvider(getApplicationContext()));
     presenter.setView(this);
@@ -59,5 +62,10 @@ public class MainActivity extends AppCompatActivity implements MainView {
   @Override
   public void setIntegerText(String integerText) {
     integerView.setText(integerText);
+  }
+
+  @Override
+  public void setColorViewBackgroundColor(int color) {
+    colorView.setBackgroundColor(color);
   }
 }

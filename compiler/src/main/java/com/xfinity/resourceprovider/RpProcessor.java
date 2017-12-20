@@ -33,6 +33,7 @@ public class RpProcessor extends AbstractProcessor {
     private static final String DRAWABLE = "drawable";
     private static final String DIMEN = "dimen";
     private static final String INTEGER = "integer";
+    private static final String COLOR = "color";
     private static final String ANDROID_APP_CLASS_TYPE = "android.app.Application";
 
     private final Messager messager = new Messager();
@@ -66,9 +67,10 @@ public class RpProcessor extends AbstractProcessor {
             try {
                 List<String> rStringVars = new ArrayList<>();
                 List<String> rPluralVars = new ArrayList<>();
-                List<String> rDrawablevars = new ArrayList<>();
+                List<String> rDrawableVars = new ArrayList<>();
                 List<String> rDimenVars = new ArrayList<>();
                 List<String> rIntegerVars = new ArrayList<>();
+                List<String> rColorVars = new ArrayList<>();
 
                 //lame.  this assumes that the application class is at the top level.  find a better way.
                 String packageName = getPackageName(processingEnv.getElementUtils(), annotatedClass);
@@ -96,7 +98,7 @@ public class RpProcessor extends AbstractProcessor {
                                    if (enclosedElement.getSimpleName().toString().equals(DRAWABLE)) {
                                        enclosedElements.stream()
                                                .filter(drawableElement -> drawableElement instanceof Symbol.VarSymbol)
-                                               .forEach(drawableElement -> rDrawablevars.add(drawableElement.toString()));
+                                               .forEach(drawableElement -> rDrawableVars.add(drawableElement.toString()));
                                    }
 
                                    if (enclosedElement.getSimpleName().toString().equals(DIMEN)) {
@@ -110,11 +112,17 @@ public class RpProcessor extends AbstractProcessor {
                                                        .filter(integerElement -> integerElement instanceof Symbol.VarSymbol)
                                                        .forEach(integerElement -> rIntegerVars.add(integerElement.toString()));
                                    }
+
+                                   if (enclosedElement.getSimpleName().toString().equals(COLOR)) {
+                                       enclosedElements.stream()
+                                                       .filter(colorElement -> colorElement instanceof Symbol.VarSymbol)
+                                                       .forEach(colorElement -> rColorVars.add(colorElement.toString()));
+                                   }
                                });
                     }
                 });
 
-                generateCode(annotatedClass, rStringVars, rPluralVars, rDrawablevars, rDimenVars, rIntegerVars);
+                generateCode(annotatedClass, rStringVars, rPluralVars, rDrawableVars, rDimenVars, rIntegerVars, rColorVars);
             } catch (UnnamedPackageException | IOException e) {
                 messager.error(annotatedElement, "Couldn't generate class for %s: %s", annotatedClass,
                                e.getMessage());
@@ -130,10 +138,12 @@ public class RpProcessor extends AbstractProcessor {
     }
 
     private void generateCode(TypeElement annotatedClass, List<String> rStringVars, List<String> rPluralVars,
-                              List<String> rDrawableVars, List<String> rDimenVars, List<String> rIntegerVars)
+                              List<String> rDrawableVars, List<String> rDimenVars, List<String> rIntegerVars,
+                              List<String> rColorVars)
             throws UnnamedPackageException, IOException {
         String packageName = getPackageName(processingEnv.getElementUtils(), annotatedClass);
-        RpCodeGenerator codeGenerator = new RpCodeGenerator(rStringVars, rPluralVars, rDrawableVars, rDimenVars, rIntegerVars);
+        RpCodeGenerator codeGenerator = new RpCodeGenerator(rStringVars, rPluralVars, rDrawableVars, rDimenVars,
+                                                            rIntegerVars, rColorVars);
         TypeSpec generatedClass = codeGenerator.generateClass();
         JavaFile javaFile = builder(packageName, generatedClass).build();
         javaFile.writeTo(processingEnv.getFiler());

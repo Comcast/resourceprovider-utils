@@ -10,6 +10,7 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import javax.lang.model.element.Modifier;
+import java.lang.annotation.Annotation;
 import java.util.List;
 
 import static com.squareup.javapoet.ClassName.get;
@@ -24,14 +25,16 @@ final class RpCodeGenerator {
     private List<String> rDrawableVars;
     private List<String> rDimenVars;
     private List<String> rIntegerVars;
+    private List<String> rColorVars;
 
     RpCodeGenerator(List<String> rClassStringVars, List<String> rClassPluralVars, List<String> rDrawableVars,
-                    List<String> rDimenVars, List<String> rIntegerVars) {
+                    List<String> rDimenVars, List<String> rIntegerVars, List<String> rColorVars) {
         this.rClassStringVars = rClassStringVars;
         this.rClassPluralVars = rClassPluralVars;
         this.rDrawableVars = rDrawableVars;
         this.rDimenVars = rDimenVars;
         this.rIntegerVars = rIntegerVars;
+        this.rColorVars = rColorVars;
     }
 
     TypeSpec generateClass() {
@@ -108,6 +111,22 @@ final class RpCodeGenerator {
 
         }
 
+        for (String var : rColorVars) {
+            try {
+                ClassName colorResAnnotation = get("android.support.annotation", "ColorRes");
+                TypeName returnType = INT.annotated(AnnotationSpec.builder(colorResAnnotation).build());
+
+                classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix(var))
+                                                 .addModifiers(Modifier.PUBLIC)
+                                                 .returns(returnType)
+                                                 .addStatement("return $T.getColor(context, R.color." + var + ")", contextCompatClassName)
+                                                 .varargs(false)
+                                                 .build());
+            } catch (IllegalArgumentException e) {
+                System.out.println("\n\nResourceProvider Compiler Error: " + e.getMessage() + ".\n\nUnable to generate API for R.color." + var + "\n\n") ;
+            }
+        }
+
         for (String var : rDimenVars) {
             try {
                 classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix(var) + "PixelSize")
@@ -134,7 +153,6 @@ final class RpCodeGenerator {
             } catch (IllegalArgumentException e) {
                 System.out.println("\n\nResourceProvider Compiler Error: " + e.getMessage() + ".\n\nUnable to generate API for R.int." + var + "\n\n") ;
             }
-
         }
 
 
