@@ -113,12 +113,9 @@ final class RpCodeGenerator {
 
         for (String var : rColorVars) {
             try {
-                ClassName colorResAnnotation = get("android.support.annotation", "ColorRes");
-                TypeName returnType = INT.annotated(AnnotationSpec.builder(colorResAnnotation).build());
-
                 classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix(var))
                                                  .addModifiers(Modifier.PUBLIC)
-                                                 .returns(returnType)
+                                                 .returns(INT)
                                                  .addStatement("return $T.getColor(context, R.color." + var + ")", contextCompatClassName)
                                                  .varargs(false)
                                                  .build());
