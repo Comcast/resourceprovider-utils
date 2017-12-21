@@ -142,11 +142,32 @@ public class RpProcessor extends AbstractProcessor {
                               List<String> rColorVars)
             throws UnnamedPackageException, IOException {
         String packageName = getPackageName(processingEnv.getElementUtils(), annotatedClass);
-        RpCodeGenerator codeGenerator = new RpCodeGenerator(rStringVars, rPluralVars, rDrawableVars, rDimenVars,
+        RpCodeGenerator codeGenerator = new RpCodeGenerator(packageName, rStringVars, rPluralVars, rDrawableVars, rDimenVars,
                                                             rIntegerVars, rColorVars);
-        TypeSpec generatedClass = codeGenerator.generateClass();
-        JavaFile javaFile = builder(packageName, generatedClass).build();
-        javaFile.writeTo(processingEnv.getFiler());
+
+        TypeSpec stringProviderClass = codeGenerator.generateStringProviderClass();
+        JavaFile stringProviderJavaFile = builder(packageName, stringProviderClass).build();
+        stringProviderJavaFile.writeTo(processingEnv.getFiler());
+
+        TypeSpec dimenProviderClass = codeGenerator.generateDimensionProviderClass();
+        JavaFile dimenProviderJavaFile = builder(packageName, dimenProviderClass).build();
+        dimenProviderJavaFile.writeTo(processingEnv.getFiler());
+
+        TypeSpec colorProviderClass = codeGenerator.generateColorProviderClass();
+        JavaFile colorProviderJavaFile = builder(packageName, colorProviderClass).build();
+        colorProviderJavaFile.writeTo(processingEnv.getFiler());
+
+        TypeSpec drawableProviderClass = codeGenerator.generateDrawableProviderClass();
+        JavaFile drawableProviderJavaFile = builder(packageName, drawableProviderClass).build();
+        drawableProviderJavaFile.writeTo(processingEnv.getFiler());
+
+        TypeSpec integerProviderClass = codeGenerator.generateIntegerProviderClass();
+        JavaFile integerProviderJavaFile = builder(packageName, integerProviderClass).build();
+        integerProviderJavaFile.writeTo(processingEnv.getFiler());
+
+        TypeSpec resourceProviderClass = codeGenerator.generateResourceProviderClass();
+        JavaFile resourceProviderJavaFile = builder(packageName, resourceProviderClass).build();
+        resourceProviderJavaFile.writeTo(processingEnv.getFiler());
     }
 }
 

@@ -18,26 +18,26 @@ class MainPresenter {
     }
 
     void present() {
-        mainView.setFormattedText(resourceProvider.getOneArgFormattedString(FORMAT_ARG));
+        mainView.setFormattedText(resourceProvider.string.getOneArgFormattedString(FORMAT_ARG));
 
         Calendar today = Calendar.getInstance();
         if (today.get(Calendar.DAY_OF_MONTH) > MONTH_HALFWAY_POINT) {
-            mainView.setDateString(resourceProvider.getSecondHalfOfMonth());
+            mainView.setDateString(resourceProvider.string.getSecondHalfOfMonth());
         } else {
-            mainView.setDateString(resourceProvider.getFirstHalfOfMonth());
+            mainView.setDateString(resourceProvider.string.getFirstHalfOfMonth());
         }
 
         int dayOfWeek = today.get(Calendar.DAY_OF_WEEK);
         int daysUntilFriday = Calendar.FRIDAY - dayOfWeek;
         if (daysUntilFriday >= 0) {
-            mainView.setPluralsString(resourceProvider.getDaysUntilFridayQuantityString(daysUntilFriday, daysUntilFriday));
+            mainView.setPluralsString(resourceProvider.string.getDaysUntilFridayQuantityString(daysUntilFriday, daysUntilFriday));
         } else {
-            mainView.setPluralsString(resourceProvider.getSaturday());
+            mainView.setPluralsString(resourceProvider.string.getSaturday());
         }
 
-        mainView.setDrawable(resourceProvider.getIcnNavDino());
-        mainView.setDimenText("The Test Dimen is " + resourceProvider.getTestDimenPixelSize() + " in pixels");
-        mainView.setIntegerText("The Test Integer is " + resourceProvider.getTestInteger());
-        mainView.setColorViewBackgroundColor(resourceProvider.getBabyBlue());
+        mainView.setDrawable(resourceProvider.drawable.getIcnNavDino());
+        mainView.setDimenText("The Test Dimen is " + resourceProvider.dimen.getTestDimenPixelSize() + " in pixels");
+        mainView.setIntegerText("The Test Integer is " + resourceProvider.integer.getTestInteger());
+        mainView.setColorViewBackgroundColor(resourceProvider.color.getBabyBlue());
     }
 }

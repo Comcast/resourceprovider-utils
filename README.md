@@ -51,6 +51,25 @@ A Java annotation processor that builds a ResourceProvider class which contains 
    public Drawable getAnyDrawable() { ... } 
    ```
    
+  Calling ResourceProvider APIS
+  =============================
+  In order to avoid conflicts with duplicate resource ids, ResourceProvider organizes its APIs into delegate providers for
+  each resource type.  To call a ResourceProvider API, clients will make a call in the format:
+  
+  ```java
+  resourceProvider.<resource_type>.<resource_name>
+  ```
+  
+  For example, to get a String resource:
+  ```java
+  resourceProvider.string.getSomeString()
+  ```
+   
+  And for a color
+  ```java
+  resourceProvider.color.getSomeColor()
+  ```
+   
   Setup
   ======================
   
