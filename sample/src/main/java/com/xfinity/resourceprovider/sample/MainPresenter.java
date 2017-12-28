@@ -18,26 +18,26 @@ class MainPresenter {
     }
 
     void present() {
-        mainView.setFormattedText(resourceProvider.string.getOneArgFormattedString(FORMAT_ARG));
+        mainView.setFormattedText(resourceProvider.getStrings().getOneArgFormattedString(FORMAT_ARG));
 
         Calendar today = Calendar.getInstance();
         if (today.get(Calendar.DAY_OF_MONTH) > MONTH_HALFWAY_POINT) {
-            mainView.setDateString(resourceProvider.string.getSecondHalfOfMonth());
+            mainView.setDateString(resourceProvider.getStrings().getSecondHalfOfMonth());
         } else {
-            mainView.setDateString(resourceProvider.string.getFirstHalfOfMonth());
+            mainView.setDateString(resourceProvider.getStrings().getFirstHalfOfMonth());
         }
 
         int dayOfWeek = today.get(Calendar.DAY_OF_WEEK);
         int daysUntilFriday = Calendar.FRIDAY - dayOfWeek;
         if (daysUntilFriday >= 0) {
-            mainView.setPluralsString(resourceProvider.string.getDaysUntilFridayQuantityString(daysUntilFriday, daysUntilFriday));
+            mainView.setPluralsString(resourceProvider.getStrings().getDaysUntilFridayQuantityString(daysUntilFriday, daysUntilFriday));
         } else {
-            mainView.setPluralsString(resourceProvider.string.getSaturday());
+            mainView.setPluralsString(resourceProvider.getStrings().getSaturday());
         }
 
-        mainView.setDrawable(resourceProvider.drawable.getIcnNavDino());
-        mainView.setDimenText("The Test Dimen is " + resourceProvider.dimen.getTestDimenPixelSize() + " in pixels");
-        mainView.setIntegerText("The Test Integer is " + resourceProvider.integer.getTestInteger());
-        mainView.setColorViewBackgroundColor(resourceProvider.color.getBabyBlue());
+        mainView.setDrawable(resourceProvider.getDrawables().getIcnNavDino());
+        mainView.setDimenText("The Test Dimen is " + resourceProvider.getDimens().getTestDimenPixelSize() + " in pixels");
+        mainView.setIntegerText("The Test Integer is " + resourceProvider.getIntegers().getTestInteger());
+        mainView.setColorViewBackgroundColor(resourceProvider.getColors().getBabyBlue());
     }
 }

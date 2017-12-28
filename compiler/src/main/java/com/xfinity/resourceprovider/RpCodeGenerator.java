@@ -10,6 +10,7 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import javax.lang.model.element.Modifier;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.squareup.javapoet.ClassName.get;
@@ -50,38 +51,68 @@ final class RpCodeGenerator {
                                            .addModifiers(PUBLIC)
                                            .addParameter(contextClassName, "context")
                                            .addStatement("this.context = context")
-                                           .addStatement("this.string = new StringProvider(context)")
-                                           .addStatement("this.drawable = new DrawableProvider(context)")
-                                           .addStatement("this.color = new ColorProvider(context)")
-                                           .addStatement("this.dimen = new DimensionProvider(context)")
-                                           .addStatement("this.integer = new IntegerProvider(context)")
+                                           .addStatement("this.stringProvider = new StringProvider(context)")
+                                           .addStatement("this.drawableProvider = new DrawableProvider(context)")
+                                           .addStatement("this.colorProvider = new ColorProvider(context)")
+                                           .addStatement("this.dimenProvider = new DimensionProvider(context)")
+                                           .addStatement("this.integerProvider = new IntegerProvider(context)")
                                            .build();
 
         ClassName stringProviderClassName = get(packageName, "StringProvider");
-        FieldSpec stringProvider = FieldSpec.builder(stringProviderClassName, "string")
-                                            .addModifiers(Modifier.PUBLIC, Modifier.FINAL).build();
+        FieldSpec stringProvider = FieldSpec.builder(stringProviderClassName, "stringProvider")
+                                            .addModifiers(Modifier.PRIVATE, Modifier.FINAL).build();
 
         ClassName drawableProviderClassName = get(packageName, "DrawableProvider");
-        FieldSpec drawableProvider = FieldSpec.builder(drawableProviderClassName, "drawable")
-                                              .addModifiers(Modifier.PUBLIC, Modifier.FINAL).build();
+        FieldSpec drawableProvider = FieldSpec.builder(drawableProviderClassName, "drawableProvider")
+                                              .addModifiers(Modifier.PRIVATE, Modifier.FINAL).build();
 
         ClassName colorProviderClassName = get(packageName, "ColorProvider");
-        FieldSpec colorProvider = FieldSpec.builder(colorProviderClassName, "color")
-                                           .addModifiers(Modifier.PUBLIC, Modifier.FINAL).build();
+        FieldSpec colorProvider = FieldSpec.builder(colorProviderClassName, "colorProvider")
+                                           .addModifiers(Modifier.PRIVATE, Modifier.FINAL).build();
 
         ClassName dimenProviderClassName = get(packageName, "DimensionProvider");
-        FieldSpec dimenProvider = FieldSpec.builder(dimenProviderClassName, "dimen")
-                                           .addModifiers(Modifier.PUBLIC, Modifier.FINAL).build();
+        FieldSpec dimenProvider = FieldSpec.builder(dimenProviderClassName, "dimenProvider")
+                                           .addModifiers(Modifier.PRIVATE, Modifier.FINAL).build();
 
         ClassName integerProviderClassName = get(packageName, "IntegerProvider");
-        FieldSpec integerProvider = FieldSpec.builder(integerProviderClassName, "integer")
-                                             .addModifiers(Modifier.PUBLIC, Modifier.FINAL).build();
+        FieldSpec integerProvider = FieldSpec.builder(integerProviderClassName, "integerProvider")
+                                             .addModifiers(Modifier.PRIVATE, Modifier.FINAL).build();
 
+        MethodSpec getStringMethodSpec = MethodSpec.methodBuilder("getStrings")
+                                                   .addModifiers(Modifier.PUBLIC)
+                                                   .addStatement("return stringProvider")
+                                                   .returns(stringProviderClassName)
+                                                   .build();
+        MethodSpec getColorMethodSpec = MethodSpec.methodBuilder("getColors")
+                                                  .addModifiers(Modifier.PUBLIC)
+                                                  .addStatement("return colorProvider")
+                                                  .returns(colorProviderClassName)
+                                                  .build();
+        MethodSpec getDrawableMethodSpec = MethodSpec.methodBuilder("getDrawables")
+                                                     .addModifiers(Modifier.PUBLIC)
+                                                     .addStatement("return drawableProvider")
+                                                     .returns(drawableProviderClassName)
+                                                     .build();
+        MethodSpec getDimenMethodSpec = MethodSpec.methodBuilder("getDimens")
+                                                  .addModifiers(Modifier.PUBLIC)
+                                                  .addStatement("return dimenProvider")
+                                                  .returns(dimenProviderClassName)
+                                                  .build();
+        MethodSpec getIntegerMethodSpec = MethodSpec.methodBuilder("getIntegers")
+                                                    .addModifiers(Modifier.PUBLIC)
+                                                    .addStatement("return integerProvider")
+                                                    .returns(integerProviderClassName)
+                                                    .build();
 
         TypeSpec.Builder classBuilder = classBuilder("ResourceProvider")
                 .addModifiers(PUBLIC)
                 .addField(contextField)
-                .addMethod(constructor)
+                .addMethods(Arrays.asList(constructor,
+                                          getStringMethodSpec,
+                                          getColorMethodSpec,
+                                          getDrawableMethodSpec,
+                                          getDimenMethodSpec,
+                                          getIntegerMethodSpec))
                 .addField(stringProvider)
                 .addField(drawableProvider)
                 .addField(colorProvider)
