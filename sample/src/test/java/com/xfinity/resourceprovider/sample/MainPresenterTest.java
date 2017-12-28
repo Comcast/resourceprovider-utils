@@ -1,5 +1,6 @@
 package com.xfinity.resourceprovider.sample;
 
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 
 import org.junit.Before;
@@ -21,9 +22,14 @@ public class MainPresenterTest {
     private static final String FIRST_HALF_OF_MONTH = "firstHalfOfMonth";
     private static final String SECOND_HALF_OF_MONTH = "secondHalfOfMonth";
 
-    @Mock MainView mainView;
-    @Mock ResourceProvider resourceProvider;
-    @Mock Drawable drawable;
+    @Mock private MainView mainView;
+    @Mock private ResourceProvider resourceProvider;
+    @Mock private StringProvider stringProvider;
+    @Mock private DrawableProvider drawableProvider;
+    @Mock private DimensionProvider dimenProvider;
+    @Mock private ColorProvider colorProvider;
+    @Mock private IntegerProvider integerProvider;
+    @Mock private Drawable drawable;
 
     private MainPresenter presenter;
 
@@ -31,10 +37,19 @@ public class MainPresenterTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
 
-        when(resourceProvider.getOneArgFormattedString(anyInt())).thenReturn(FORMATTED_STRING);
-        when(resourceProvider.getFirstHalfOfMonth()).thenReturn(FIRST_HALF_OF_MONTH);
-        when(resourceProvider.getSecondHalfOfMonth()).thenReturn(SECOND_HALF_OF_MONTH);
-        when(resourceProvider.getIcnNavDino()).thenReturn(drawable);
+        when(resourceProvider.getStrings()).thenReturn(stringProvider);
+        when(resourceProvider.getDrawables()).thenReturn(drawableProvider);
+        when(resourceProvider.getColors()).thenReturn(colorProvider);
+        when(resourceProvider.getDimens()).thenReturn(dimenProvider);
+        when(resourceProvider.getIntegers()).thenReturn(integerProvider);
+
+        when(stringProvider.getOneArgFormattedString(anyInt())).thenReturn(FORMATTED_STRING);
+        when(stringProvider.getFirstHalfOfMonth()).thenReturn(FIRST_HALF_OF_MONTH);
+        when(stringProvider.getSecondHalfOfMonth()).thenReturn(SECOND_HALF_OF_MONTH);
+        when(drawableProvider.getIcnNavDino()).thenReturn(drawable);
+        when(dimenProvider.getTestDimenPixelSize()).thenReturn(42);
+        when(colorProvider.getBabyBlue()).thenReturn(Color.BLUE);
+        when(integerProvider.getTestInteger()).thenReturn(42);
 
         presenter = new MainPresenter(resourceProvider);
     }
@@ -43,7 +58,7 @@ public class MainPresenterTest {
     public void drawable_presents_correctly() {
         presenter.setView(mainView);
         presenter.present();
-        verify(resourceProvider).getIcnNavDino();
+        verify(drawableProvider).getIcnNavDino();
         verify(mainView).setDrawable(drawable);
     }
 
@@ -52,7 +67,7 @@ public class MainPresenterTest {
         presenter.setView(mainView);
         presenter.present();
 
-        verify(resourceProvider).getOneArgFormattedString(anyInt());
+        verify(stringProvider).getOneArgFormattedString(anyInt());
         verify(mainView).setFormattedText(FORMATTED_STRING);
     }
 
@@ -64,10 +79,10 @@ public class MainPresenterTest {
         presenter.present();
 
         if (today.get(Calendar.DAY_OF_MONTH) > 15) {
-            verify(resourceProvider).getSecondHalfOfMonth();
+            verify(stringProvider).getSecondHalfOfMonth();
             verify(mainView).setDateString(SECOND_HALF_OF_MONTH);
         } else {
-            verify(resourceProvider).getFirstHalfOfMonth();
+            verify(stringProvider).getFirstHalfOfMonth();
             verify(mainView).setDateString(FIRST_HALF_OF_MONTH);
         }
     }
