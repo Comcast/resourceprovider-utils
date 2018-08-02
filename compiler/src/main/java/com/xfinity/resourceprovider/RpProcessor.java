@@ -168,6 +168,8 @@ public class RpProcessor extends AbstractProcessor {
         TypeSpec resourceProviderClass = codeGenerator.generateResourceProviderClass();
         JavaFile resourceProviderJavaFile = builder(packageName, resourceProviderClass).build();
         resourceProviderJavaFile.writeTo(processingEnv.getFiler());
+
+        new RpKtCodeGenerator().generateTestUtils(resourceProviderJavaFile.packageName, processingEnv);
     }
 }
 

@@ -6,13 +6,13 @@ import com.xfinitymobile.resourceprovider.testutils.IntegerProviderAnswer
 import com.xfinitymobile.resourceprovider.testutils.StringProviderAnswer
 import org.mockito.Mockito
 
-fun ResourceProvider.mock() {
-    this.mockStrings()
-    this.mockDrawables()
-    this.mockDimens()
-    this.mockColors()
-    this.mockIntegers()
-}
+//fun ResourceProvider.mock() {
+//    this.mockStrings()
+//    this.mockDrawables()
+//    this.mockDimens()
+//    this.mockColors()
+//    this.mockIntegers()
+//}
 
 fun ResourceProvider.mockStrings() {
     whenever(this.strings).thenReturn(Mockito.mock(StringProvider::class.java, StringProviderAnswer()))
