@@ -1,6 +1,7 @@
 package com.xfinity.resourceprovider.sample
 
 import android.graphics.drawable.Drawable
+import com.xfinity.resourceprovider.testutils.mock
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith

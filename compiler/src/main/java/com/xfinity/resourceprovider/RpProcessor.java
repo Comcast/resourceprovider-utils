@@ -14,6 +14,7 @@ import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
+import javax.annotation.processing.SupportedOptions;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
@@ -24,6 +25,7 @@ import static java.util.Collections.singleton;
 import static javax.lang.model.SourceVersion.latestSupported;
 
 @AutoService(Processor.class)
+@SupportedOptions("kapt.kotlin.generated")
 public class RpProcessor extends AbstractProcessor {
 
     private static final String ANNOTATION = "@" + RpApplication.class.getSimpleName();
@@ -169,7 +171,13 @@ public class RpProcessor extends AbstractProcessor {
         JavaFile resourceProviderJavaFile = builder(packageName, resourceProviderClass).build();
         resourceProviderJavaFile.writeTo(processingEnv.getFiler());
 
-        new RpKtCodeGenerator().generateTestUtils(resourceProviderJavaFile.packageName, processingEnv);
+        try {
+            //if the client has included the testutils lib, generate the test utils
+            Class.forName("com.xfinity.resourceprovider.testutils.StringProviderAnswer");
+            new RpKtCodeGenerator().generateTestUtils(resourceProviderJavaFile.packageName, processingEnv);
+        } catch (ClassNotFoundException ignored) {
+            //ignore
+        }
     }
 }
 

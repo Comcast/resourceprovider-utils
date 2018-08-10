@@ -1,4 +1,4 @@
-package com.xfinitymobile.resourceprovider.testutils
+package com.xfinity.resourceprovider.testutils
 
 import android.graphics.drawable.Drawable
 import org.mockito.Mockito

@@ -4,16 +4,13 @@ apply plugin: 'kotlin-android'
 android {
     compileSdkVersion 27
 
-
-
     defaultConfig {
-        minSdkVersion 17
+        minSdkVersion 15
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
     }
 
     buildTypes {
