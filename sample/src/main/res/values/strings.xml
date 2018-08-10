@@ -1,6 +1,6 @@
 <resources>
 
-  <string name="app_name">Resource Manager Sample</string>
+  <string name="app_name">Resource Provider Sample</string>
   <string name="activity_a">Activity A</string>
   <string name="activity_b">Activity B</string>
   <string name="one_arg_formatted_string">This format string has %1$d args</string>
