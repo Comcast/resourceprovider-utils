@@ -1,25 +1,55 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+
+kapt {
+  correctErrorTypes = true
+  generateStubs = true
+}
 
 android {
-  compileSdkVersion 26
+  compileSdkVersion 27
   buildToolsVersion '26.0.2'
 
   defaultConfig {
-    applicationId 'com.xfinity.resourcemanager.sample'
+    applicationId 'com.xfinity.resourceprovider.sample'
     minSdkVersion 15
     targetSdkVersion 26
     versionCode 1
     versionName rootProject.publishVersion
   }
+
+  sourceSets {
+    test {
+      java {
+        srcDir "${buildDir.absolutePath}/generated/source/kaptKotlin/"
+      }
+    }
+  }
 }
 
 dependencies {
-  compile 'com.android.support:appcompat-v7:26.1.0'
+  compile 'com.android.support:appcompat-v7:27.1.1'
   compile 'com.jakewharton:butterknife:8.7.0'
+  compile 'com.nhaarman:mockito-kotlin:1.6.0'
+  compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
   compile project(':library')
-  annotationProcessor project(':compiler')
+  compile project(':testutils')
+  kapt project(':compiler')
 
   testCompile 'junit:junit:4.12',
-              'org.mockito:mockito-core:2.7.21'
+              'org.mockito:mockito-core:2.7.21',
+              project(':testutils')
+
+  testImplementation('com.nhaarman:mockito-kotlin:1.4.0',
+                     {
+                       exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib'
+                       exclude group: 'org.jetbrains.kotlin', module: 'kotlin-reflect'
+                     })
+
+    kaptTest project(':compiler')
+}
+repositories {
+    mavenCentral()
 }
