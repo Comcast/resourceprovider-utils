@@ -29,10 +29,10 @@ android {
 }
 
 dependencies {
-  compile 'com.android.support:appcompat-v7:27.1.1'
-  compile 'com.jakewharton:butterknife:8.7.0'
-  compile 'com.nhaarman:mockito-kotlin:1.6.0'
-  compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+  implementation 'com.android.support:appcompat-v7:27.1.1'
+  implementation 'com.jakewharton:butterknife:8.7.0'
+  implementation 'com.nhaarman:mockito-kotlin:1.6.0'
+  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
   compile project(':library')
   compile project(':testutils')
