@@ -1,4 +1,4 @@
-Android Resource Provider - BETA
+Android Resource Provider
 ======================
 
 A Java annotation processor that builds a ResourceProvider class which contains an API to get Android Resources
@@ -57,17 +57,17 @@ A Java annotation processor that builds a ResourceProvider class which contains 
   each resource type.  To call a ResourceProvider API, clients will make a call in the format:
   
   ```java
-  resourceProvider.<resource_type>.<resource_name>
+  resourceProvider.get<resource_type>().get<resource_name>()
   ```
   
   For example, to get a String resource:
   ```java
-  resourceProvider.string.getSomeString()
+  resourceProvider.getStrings().getSomeString()
   ```
    
   And for a color
   ```java
-  resourceProvider.color.getSomeColor()
+  resourceProvider.getColors().getSomeColor()
   ```
    
   Setup

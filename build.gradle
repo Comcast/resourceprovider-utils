@@ -5,7 +5,7 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.1'
+        classpath 'com.android.tools.build:gradle:3.2.1'
         classpath 'com.novoda:bintray-release:0.2.10'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
@@ -18,7 +18,7 @@ allprojects {
     }
 
     group = 'com.xfinity'
-    version = '0.11'
+    version = '1.0'
 }
 
 ext {
@@ -26,6 +26,6 @@ ext {
     artifactPrefix = 'resourceprovider'
     groupId = 'com.xfinity'
     uploadName = 'Resource-Provider'
-    publishVersion = '0.11'
+    publishVersion = '1.0'
     description = 'Utility for Auto-Generating an Android-Agnostic Resource Provider API'
 }
