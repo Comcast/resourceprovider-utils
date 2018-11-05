@@ -3,7 +3,7 @@ package com.xfinity.resourceprovider.sample;
 import java.util.Calendar;
 
 class MainPresenter {
-    private static final int FORMAT_ARG = 10000;
+    static final int FORMAT_ARG = 10000;
     private static final int MONTH_HALFWAY_POINT = 15;
 
     private final ResourceProvider resourceProvider;

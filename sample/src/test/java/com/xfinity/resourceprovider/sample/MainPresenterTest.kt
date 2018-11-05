@@ -1,11 +1,9 @@
 package com.xfinity.resourceprovider.sample
 
-import android.graphics.drawable.Drawable
 import com.xfinity.resourceprovider.testutils.mock
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.Mock
 import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
@@ -14,12 +12,8 @@ import java.util.Calendar
 
 @RunWith(MockitoJUnitRunner.Silent::class)
 class MainPresenterTest {
-    @Mock
-    private lateinit var mainView: MainView
-    @Mock
-    private lateinit var resourceProvider: ResourceProvider
-
-    private lateinit var drawable: Drawable
+    @Mock private lateinit var mainView: MainView
+    @Mock private lateinit var resourceProvider: ResourceProvider
     private lateinit var presenter: MainPresenter
 
     @Before
@@ -41,7 +35,8 @@ class MainPresenterTest {
         presenter.setView(mainView)
         presenter.present()
 
-        verify<MainView>(mainView).setFormattedText(resourceProvider.strings.getOneArgFormattedString(anyInt()))
+        verify<MainView>(mainView)
+                .setFormattedText(resourceProvider.strings.getOneArgFormattedString(MainPresenter.FORMAT_ARG))
     }
 
 
