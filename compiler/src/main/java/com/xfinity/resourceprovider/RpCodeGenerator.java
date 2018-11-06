@@ -27,6 +27,7 @@ final class RpCodeGenerator {
     private List<String> rClassDimenVars;
     private List<String> rClassIntegerVars;
     private List<String> rClassColorVars;
+    private List<String> rClassIdVars;
 
     private final ClassName contextClassName = get("android.content", "Context");
     private final FieldSpec contextField = FieldSpec.builder(contextClassName, "context", Modifier.PRIVATE).build();
@@ -36,7 +37,8 @@ final class RpCodeGenerator {
     private TypeName contextCompatClassName = get("android.support.v4.content", "ContextCompat");
 
     RpCodeGenerator(String packageName, List<String> rClassStringVars, List<String> rClassPluralVars, List<String> rClassDrawableVars,
-                    List<String> rClassDimenVars, List<String> rClassIntegerVars, List<String> rClassColorVars) {
+                    List<String> rClassDimenVars, List<String> rClassIntegerVars, List<String> rClassColorVars,
+                    List<String> rClassIdVars) {
         this.packageName = packageName;
         this.rClassStringVars = rClassStringVars;
         this.rClassPluralVars = rClassPluralVars;
@@ -44,10 +46,11 @@ final class RpCodeGenerator {
         this.rClassDimenVars = rClassDimenVars;
         this.rClassIntegerVars = rClassIntegerVars;
         this.rClassColorVars = rClassColorVars;
+        this.rClassIdVars = rClassIdVars;
     }
 
-    TypeSpec generateResourceProviderClass() {
-        MethodSpec constructor = MethodSpec.constructorBuilder()
+    TypeSpec generateResourceProviderClass(boolean generateIdProvider) {
+        MethodSpec.Builder constructorBuilder = MethodSpec.constructorBuilder()
                                            .addModifiers(PUBLIC)
                                            .addParameter(contextClassName, "context")
                                            .addStatement("this.context = context")
@@ -55,8 +58,13 @@ final class RpCodeGenerator {
                                            .addStatement("this.drawableProvider = new DrawableProvider(context)")
                                            .addStatement("this.colorProvider = new ColorProvider(context)")
                                            .addStatement("this.dimenProvider = new DimensionProvider(context)")
-                                           .addStatement("this.integerProvider = new IntegerProvider(context)")
-                                           .build();
+                                           .addStatement("this.integerProvider = new IntegerProvider(context)");
+
+        if (generateIdProvider) {
+            constructorBuilder.addStatement("this.idProvider = new IdProvider(context)");
+        }
+
+        MethodSpec constructor = constructorBuilder.build();
 
         ClassName stringProviderClassName = get(packageName, "StringProvider");
         FieldSpec stringProvider = FieldSpec.builder(stringProviderClassName, "stringProvider")
@@ -76,6 +84,10 @@ final class RpCodeGenerator {
 
         ClassName integerProviderClassName = get(packageName, "IntegerProvider");
         FieldSpec integerProvider = FieldSpec.builder(integerProviderClassName, "integerProvider")
+                                             .addModifiers(Modifier.PRIVATE, Modifier.FINAL).build();
+
+        ClassName idProviderClassName = get(packageName, "IdProvider");
+        FieldSpec idProvider = FieldSpec.builder(idProviderClassName, "idProvider")
                                              .addModifiers(Modifier.PRIVATE, Modifier.FINAL).build();
 
         MethodSpec getStringMethodSpec = MethodSpec.methodBuilder("getStrings")
@@ -104,6 +116,15 @@ final class RpCodeGenerator {
                                                     .returns(integerProviderClassName)
                                                     .build();
 
+        MethodSpec getIdMethodSpec = null;
+        if (generateIdProvider) {
+            getIdMethodSpec = MethodSpec.methodBuilder("getIds")
+                                                        .addModifiers(Modifier.PUBLIC)
+                                                        .addStatement("return idProvider")
+                                                        .returns(idProviderClassName)
+                                                        .build();
+        }
+
         TypeSpec.Builder classBuilder = classBuilder("ResourceProvider")
                 .addModifiers(PUBLIC)
                 .addField(contextField)
@@ -118,6 +139,11 @@ final class RpCodeGenerator {
                 .addField(colorProvider)
                 .addField(dimenProvider)
                 .addField(integerProvider);
+
+        if (generateIdProvider) {
+            classBuilder.addMethod(getIdMethodSpec);
+            classBuilder.addField(idProvider);
+        }
 
         return classBuilder.build();
     }
@@ -264,6 +290,36 @@ final class RpCodeGenerator {
         }
 
 
+
+        return classBuilder.build();
+    }
+
+    TypeSpec generateIdProviderClass() {
+        MethodSpec constructor = MethodSpec.constructorBuilder()
+                                           .addModifiers(PUBLIC)
+                                           .addParameter(contextClassName, "context")
+                                           .addStatement("this.context = context")
+                                           .build();
+
+        TypeSpec.Builder classBuilder = classBuilder("IdProvider")
+                .addModifiers(PUBLIC)
+                .addField(contextField)
+                .addMethod(constructor)
+                .addAnnotation(suppressLint);
+
+
+        for (String var : rClassIdVars) {
+            try {
+                classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix(var))
+                                                 .addModifiers(Modifier.PUBLIC)
+                                                 .returns(INT)
+                                                 .addStatement("return R.id." + var)
+                                                 .varargs(false)
+                                                 .build());
+            } catch (IllegalArgumentException e) {
+                System.out.println("\n\nResourceProvider Compiler Error: " + e.getMessage() + ".\n\nUnable to generate API for R.id." + var + "\n\n") ;
+            }
+        }
 
         return classBuilder.build();
     }

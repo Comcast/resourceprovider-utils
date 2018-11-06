@@ -9,5 +9,6 @@ interface MainView {
     void setDrawable(Drawable drawable);
     void setDimenText(String dimenText);
     void setIntegerText(String integerText);
+    void setIdText(String integerText);
     void setColorViewBackgroundColor(int color);
 }

@@ -7,7 +7,7 @@ import java.io.File
 import javax.annotation.processing.ProcessingEnvironment
 
 class RpKtCodeGenerator {
-    fun generateTestUtils(receiverPackageName: String, processingEnv: ProcessingEnvironment) {
+    fun generateTestUtils(receiverPackageName: String, processingEnv: ProcessingEnvironment, generateIdsMock: Boolean) {
         val mockStringsFunSpec = FunSpec.builder("mockStrings")
                 .receiver(ClassName(receiverPackageName, "ResourceProvider"))
                 .addStatement(
@@ -44,22 +44,41 @@ class RpKtCodeGenerator {
                                 "com.xfinity.resourceprovider.testutils.IntegerProviderAnswer()))")
                 .build()
 
-        val mockFunSpec = FunSpec.builder("mock")
+        val mockIdsFunSpec = FunSpec.builder("mockIds")
+                .receiver(ClassName(receiverPackageName, "ResourceProvider"))
+                .addStatement(
+                        "com.nhaarman.mockito_kotlin.whenever(this.ids).thenReturn(" +
+                                "org.mockito.Mockito.mock($receiverPackageName.IdProvider::class.java, " +
+                                "com.xfinity.resourceprovider.testutils.IntegerProviderAnswer()))")
+                .build()
+
+        val mockFunSpecBuilder = FunSpec.builder("mock")
                 .receiver(ClassName(receiverPackageName, "ResourceProvider"))
                 .addStatement("this.mockStrings()")
                 .addStatement("this.mockDrawables()")
                 .addStatement("this.mockColors()")
                 .addStatement("this.mockDimens()")
-                .addStatement("this.mockIntegers()").build()
+                .addStatement("this.mockIntegers()")
 
-        val kotlinFile = FileSpec.builder("com.xfinity.resourceprovider.testutils", "GeneratedResourceProviderTestUtils")
+        if (generateIdsMock) {
+            mockFunSpecBuilder.addStatement("this.mockIds()")
+        }
+
+        val mockFunSpec = mockFunSpecBuilder.build()
+
+        val kotlinFileBuilder = FileSpec.builder("com.xfinity.resourceprovider.testutils", "GeneratedResourceProviderTestUtils")
                 .addFunction(mockStringsFunSpec)
                 .addFunction(mockColorsFunSpec)
                 .addFunction(mockDrawablesFunSpec)
                 .addFunction(mockDimensFunSpec)
                 .addFunction(mockIntegersFunSpec)
-                .addFunction(mockFunSpec)
-                .build()
+
+        if (generateIdsMock) {
+            kotlinFileBuilder.addFunction(mockIdsFunSpec)
+        }
+
+        kotlinFileBuilder.addFunction(mockFunSpec)
+        val kotlinFile = kotlinFileBuilder.build()
 
         val kaptKotlinGeneratedDir = processingEnv.options["kapt.kotlin.generated"]
         kotlinFile.writeTo(File(kaptKotlinGeneratedDir, "${kotlinFile.name}.kt"))
