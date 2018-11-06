@@ -38,7 +38,6 @@ class StringProviderAnswer : Answer<Any?> {
     private val delegate = Mockito.RETURNS_DEFAULTS!!
 
     override fun answer(invocation: InvocationOnMock?): Any? {
-        invocation?.method?.isVarArgs
         val invocationMethodReturn = invocation?.method?.returnType
         val stringType = String::class.java
         return when (invocationMethodReturn) {
