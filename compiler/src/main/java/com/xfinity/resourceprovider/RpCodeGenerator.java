@@ -8,14 +8,11 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
-import javafx.util.Pair;
+import com.sun.tools.javac.util.Pair;
 
 import javax.lang.model.element.Modifier;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static com.squareup.javapoet.ClassName.get;
 import static com.squareup.javapoet.TypeName.INT;
@@ -320,12 +317,12 @@ final class RpCodeGenerator {
                                                                  new Pair<>("R.color.", rClassColorVars));
 
         for (Pair<String, List<String>> pair : idPairs) {
-            for (String var : pair.getValue()) {
+            for (String var : pair.snd) {
                 try {
                     classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix(var) + "Id")
                                                      .addModifiers(Modifier.PUBLIC)
                                                      .returns(INT)
-                                                     .addStatement("return " + pair.getKey() + var)
+                                                     .addStatement("return " + pair.fst + var)
                                                      .varargs(false)
                                                      .build());
                 } catch (IllegalArgumentException e) {
