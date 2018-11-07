@@ -319,7 +319,15 @@ final class RpCodeGenerator {
         for (Pair<String, List<String>> pair : idPairs) {
             for (String var : pair.snd) {
                 try {
-                    classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix(var) + "ResId")
+                    final String resType = getResType(pair.fst);
+                    final String methodName;
+                    if (resType.equals("Id")) {
+                        methodName = "get" + getterSuffix(var) + "Id";
+                    } else {
+                        methodName = "get" + getterSuffix(var) + resType + "Id";
+                    }
+
+                    classBuilder.addMethod(MethodSpec.methodBuilder(methodName)
                                                      .addModifiers(Modifier.PUBLIC)
                                                      .returns(INT)
                                                      .addStatement("return " + pair.fst + var)
@@ -379,5 +387,11 @@ final class RpCodeGenerator {
         }
 
         return getterSuffix.toString();
+    }
+
+    private String getResType(String resIdName) {
+        final String resTypeSuffix = resIdName.substring(3,resIdName.length() - 1);
+        final Character firstLetterCapitalized = Character.toUpperCase(resIdName.charAt(2));
+        return firstLetterCapitalized + resTypeSuffix;
     }
 }
