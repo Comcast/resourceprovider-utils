@@ -319,14 +319,14 @@ final class RpCodeGenerator {
         for (Pair<String, List<String>> pair : idPairs) {
             for (String var : pair.snd) {
                 try {
-                    classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix(var) + "Id")
+                    classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix(var) + "ResId")
                                                      .addModifiers(Modifier.PUBLIC)
                                                      .returns(INT)
                                                      .addStatement("return " + pair.fst + var)
                                                      .varargs(false)
                                                      .build());
                 } catch (IllegalArgumentException e) {
-                    System.out.println("\n\nResourceProvider Compiler Error: " + e.getMessage() + ".\n\nUnable to generate API for R.id." + var + "\n\n");
+                    System.out.println("\n\nResourceProvider Compiler Error: " + e.getMessage() + ".\n\nUnable to generate API for " + pair.fst + var + "\n\n");
                 }
             }
         }

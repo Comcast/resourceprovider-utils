@@ -45,7 +45,7 @@ class MainPresenterTest {
         presenter.present()
 
         verify<MainView>(mainView)
-                .setIdText("The Id TextView id is " + resourceProvider.ids.idTextId)
+                .setIdText("The Id TextView id is " + resourceProvider.ids.idTextResId)
     }
 
 
