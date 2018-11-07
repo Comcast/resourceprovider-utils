@@ -38,7 +38,7 @@ class MainPresenter {
         mainView.setDrawable(resourceProvider.getDrawables().getIcnNavDino());
         mainView.setDimenText("The Test Dimen is " + resourceProvider.getDimens().getTestDimenPixelSize() + " in pixels");
         mainView.setIntegerText("The Test Integer is " + resourceProvider.getIntegers().getTestInteger());
-        mainView.setIdText("The Id TextView id is " + resourceProvider.getIds().getIdText());
+        mainView.setIdText("The Id TextView id is " + resourceProvider.getIds().getIdTextId());
         mainView.setColorViewBackgroundColor(resourceProvider.getColors().getBabyBlue());
     }
 }

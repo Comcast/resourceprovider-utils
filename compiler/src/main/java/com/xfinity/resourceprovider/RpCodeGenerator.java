@@ -8,10 +8,14 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
+import javafx.util.Pair;
 
 import javax.lang.model.element.Modifier;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.squareup.javapoet.ClassName.get;
 import static com.squareup.javapoet.TypeName.INT;
@@ -307,17 +311,26 @@ final class RpCodeGenerator {
                 .addMethod(constructor)
                 .addAnnotation(suppressLint);
 
+        List<Pair<String, List<String>>> idPairs = Arrays.asList(new Pair<>("R.id.", rClassIdVars),
+                                                                 new Pair<>("R.string.", rClassStringVars),
+                                                                 new Pair<>("R.plurals.", rClassPluralVars),
+                                                                 new Pair<>("R.drawable.", rClassDrawableVars),
+                                                                 new Pair<>("R.dimen.", rClassDimenVars),
+                                                                 new Pair<>("R.integer.", rClassIntegerVars),
+                                                                 new Pair<>("R.color.", rClassColorVars));
 
-        for (String var : rClassIdVars) {
-            try {
-                classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix(var))
-                                                 .addModifiers(Modifier.PUBLIC)
-                                                 .returns(INT)
-                                                 .addStatement("return R.id." + var)
-                                                 .varargs(false)
-                                                 .build());
-            } catch (IllegalArgumentException e) {
-                System.out.println("\n\nResourceProvider Compiler Error: " + e.getMessage() + ".\n\nUnable to generate API for R.id." + var + "\n\n") ;
+        for (Pair<String, List<String>> pair : idPairs) {
+            for (String var : pair.getValue()) {
+                try {
+                    classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix(var) + "Id")
+                                                     .addModifiers(Modifier.PUBLIC)
+                                                     .returns(INT)
+                                                     .addStatement("return " + pair.getKey() + var)
+                                                     .varargs(false)
+                                                     .build());
+                } catch (IllegalArgumentException e) {
+                    System.out.println("\n\nResourceProvider Compiler Error: " + e.getMessage() + ".\n\nUnable to generate API for R.id." + var + "\n\n");
+                }
             }
         }
 
