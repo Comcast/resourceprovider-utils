@@ -5,4 +5,6 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.ElementType.TYPE;
 
 @Target(value = TYPE)
-public @interface RpApplication {}
+public @interface RpApplication {
+    boolean generateIdProvider() default true;
+}

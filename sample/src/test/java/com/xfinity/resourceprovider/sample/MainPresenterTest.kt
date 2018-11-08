@@ -39,6 +39,15 @@ class MainPresenterTest {
                 .setFormattedText(resourceProvider.strings.getOneArgFormattedString(MainPresenter.FORMAT_ARG))
     }
 
+    @Test
+    fun id_presents_correctly() {
+        presenter.setView(mainView)
+        presenter.present()
+
+        verify<MainView>(mainView)
+                .setIdText("The Id TextView id is " + resourceProvider.ids.idTextId)
+    }
+
 
     @Test
     fun date_presents_correctly() {

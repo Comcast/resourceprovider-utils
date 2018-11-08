@@ -13,6 +13,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
   private TextView pluralsView;
   private TextView dimenView;
   private TextView integerView;
+  private TextView idView;
   private ImageView imageView;
   private View colorView;
 
@@ -27,6 +28,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
     imageView = findViewById(R.id.image);
     dimenView = findViewById(R.id.dimen_text);
     integerView = findViewById(R.id.integer_text);
+    idView = findViewById(R.id.id_text);
     colorView = findViewById(R.id.color_view);
 
     MainPresenter presenter = new MainPresenter(new ResourceProvider(getApplicationContext()));
@@ -62,6 +64,11 @@ public class MainActivity extends AppCompatActivity implements MainView {
   @Override
   public void setIntegerText(String integerText) {
     integerView.setText(integerText);
+  }
+
+  @Override
+  public void setIdText(String idText) {
+    idView.setText(idText);
   }
 
   @Override

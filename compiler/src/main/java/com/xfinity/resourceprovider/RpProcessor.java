@@ -36,6 +36,7 @@ public class RpProcessor extends AbstractProcessor {
     private static final String DIMEN = "dimen";
     private static final String INTEGER = "integer";
     private static final String COLOR = "color";
+    private static final String ID = "id";
     private static final String ANDROID_APP_CLASS_TYPE = "android.app.Application";
 
     private final Messager messager = new Messager();
@@ -73,11 +74,13 @@ public class RpProcessor extends AbstractProcessor {
                 List<String> rDimenVars = new ArrayList<>();
                 List<String> rIntegerVars = new ArrayList<>();
                 List<String> rColorVars = new ArrayList<>();
+                List<String> rIdVars = new ArrayList<>();
 
                 //lame.  this assumes that the application class is at the top level.  find a better way.
                 String packageName = getPackageName(processingEnv.getElementUtils(), annotatedClass);
                 String rClassName = packageName + R_CLASS_IDENTIFIER;
 
+                boolean generateIdProvider = annotatedElement.getAnnotation(RpApplication.class).generateIdProvider();
                 roundEnv.getRootElements().stream().filter(element -> element instanceof TypeElement).forEach(element -> {
                     TypeElement typeElement = (TypeElement) element;
                     if (typeElement.getQualifiedName().toString().equals(rClassName)) {
@@ -120,11 +123,20 @@ public class RpProcessor extends AbstractProcessor {
                                                        .filter(colorElement -> colorElement instanceof Symbol.VarSymbol)
                                                        .forEach(colorElement -> rColorVars.add(colorElement.toString()));
                                    }
+
+                                   if (generateIdProvider) {
+                                       if (enclosedElement.getSimpleName().toString().equals(ID)) {
+                                           enclosedElements.stream()
+                                                           .filter(idElement -> idElement instanceof Symbol.VarSymbol)
+                                                           .forEach(idElement -> rIdVars.add(idElement.toString()));
+                                       }
+                                   }
                                });
                     }
                 });
 
-                generateCode(annotatedClass, rStringVars, rPluralVars, rDrawableVars, rDimenVars, rIntegerVars, rColorVars);
+                generateCode(annotatedClass, rStringVars, rPluralVars, rDrawableVars, rDimenVars, rIntegerVars,
+                             rColorVars, rIdVars);
             } catch (UnnamedPackageException | IOException e) {
                 messager.error(annotatedElement, "Couldn't generate class for %s: %s", annotatedClass,
                                e.getMessage());
@@ -141,11 +153,11 @@ public class RpProcessor extends AbstractProcessor {
 
     private void generateCode(TypeElement annotatedClass, List<String> rStringVars, List<String> rPluralVars,
                               List<String> rDrawableVars, List<String> rDimenVars, List<String> rIntegerVars,
-                              List<String> rColorVars)
+                              List<String> rColorVars, List<String> rIdVars)
             throws UnnamedPackageException, IOException {
         String packageName = getPackageName(processingEnv.getElementUtils(), annotatedClass);
         RpCodeGenerator codeGenerator = new RpCodeGenerator(packageName, rStringVars, rPluralVars, rDrawableVars, rDimenVars,
-                                                            rIntegerVars, rColorVars);
+                                                            rIntegerVars, rColorVars, rIdVars);
 
         TypeSpec stringProviderClass = codeGenerator.generateStringProviderClass();
         JavaFile stringProviderJavaFile = builder(packageName, stringProviderClass).build();
@@ -167,14 +179,22 @@ public class RpProcessor extends AbstractProcessor {
         JavaFile integerProviderJavaFile = builder(packageName, integerProviderClass).build();
         integerProviderJavaFile.writeTo(processingEnv.getFiler());
 
-        TypeSpec resourceProviderClass = codeGenerator.generateResourceProviderClass();
+        boolean generateIdProvider = rIdVars.size() > 0;
+        if (generateIdProvider) {
+            TypeSpec idProviderClass = codeGenerator.generateIdProviderClass();
+            JavaFile idProviderJavaFile = builder(packageName, idProviderClass).build();
+            idProviderJavaFile.writeTo(processingEnv.getFiler());
+        }
+
+        TypeSpec resourceProviderClass = codeGenerator.generateResourceProviderClass(generateIdProvider);
         JavaFile resourceProviderJavaFile = builder(packageName, resourceProviderClass).build();
         resourceProviderJavaFile.writeTo(processingEnv.getFiler());
 
         try {
             //if the client has included the testutils lib, generate the test utils
             Class.forName("com.xfinity.resourceprovider.testutils.StringProviderAnswer");
-            new RpKtCodeGenerator().generateTestUtils(resourceProviderJavaFile.packageName, processingEnv);
+            new RpKtCodeGenerator().generateTestUtils(resourceProviderJavaFile.packageName, processingEnv,
+                                                      generateIdProvider);
         } catch (ClassNotFoundException ignored) {
             //ignore
         }
