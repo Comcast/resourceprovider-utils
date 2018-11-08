@@ -308,33 +308,25 @@ final class RpCodeGenerator {
                 .addMethod(constructor)
                 .addAnnotation(suppressLint);
 
-        List<Pair<String, List<String>>> idPairs = Arrays.asList(new Pair<>("R.id.", rClassIdVars),
-                                                                 new Pair<>("R.string.", rClassStringVars),
-                                                                 new Pair<>("R.plurals.", rClassPluralVars),
-                                                                 new Pair<>("R.drawable.", rClassDrawableVars),
-                                                                 new Pair<>("R.dimen.", rClassDimenVars),
-                                                                 new Pair<>("R.integer.", rClassIntegerVars),
-                                                                 new Pair<>("R.color.", rClassColorVars));
+        List<IdInfo> idInfoList = Arrays.asList(new IdInfo("R.id.", "", rClassIdVars),
+                                                new IdInfo("R.string.", "String", rClassStringVars),
+                                                new IdInfo("R.plurals.", "Plural", rClassPluralVars),
+                                                new IdInfo("R.drawable.", "Drawable", rClassDrawableVars),
+                                                new IdInfo("R.dimen.", "Dimen", rClassDimenVars),
+                                                new IdInfo("R.integer.", "Integer", rClassIntegerVars),
+                                                new IdInfo("R.color.", "Color", rClassColorVars));
 
-        for (Pair<String, List<String>> pair : idPairs) {
-            for (String var : pair.snd) {
+        for (IdInfo info : idInfoList) {
+            for (String var : info.classVars) {
                 try {
-                    final String resType = getResType(pair.fst);
-                    final String methodName;
-                    if (resType.equals("Id")) {
-                        methodName = "get" + getterSuffix(var) + "Id";
-                    } else {
-                        methodName = "get" + getterSuffix(var) + resType + "Id";
-                    }
-
-                    classBuilder.addMethod(MethodSpec.methodBuilder(methodName)
+                    classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix(var) + info.resType + "Id")
                                                      .addModifiers(Modifier.PUBLIC)
                                                      .returns(INT)
-                                                     .addStatement("return " + pair.fst + var)
+                                                     .addStatement("return " + info.idResPrefix + var)
                                                      .varargs(false)
                                                      .build());
                 } catch (IllegalArgumentException e) {
-                    System.out.println("\n\nResourceProvider Compiler Error: " + e.getMessage() + ".\n\nUnable to generate API for " + pair.fst + var + "\n\n");
+                    System.out.println("\n\nResourceProvider Compiler Error: " + e.getMessage() + ".\n\nUnable to generate API for " + info.idResPrefix + var + "\n\n");
                 }
             }
         }
@@ -389,9 +381,15 @@ final class RpCodeGenerator {
         return getterSuffix.toString();
     }
 
-    private String getResType(String resIdName) {
-        final String resTypeSuffix = resIdName.substring(3,resIdName.length() - 1);
-        final Character firstLetterCapitalized = Character.toUpperCase(resIdName.charAt(2));
-        return firstLetterCapitalized + resTypeSuffix;
+    class IdInfo {
+        String idResPrefix;
+        String resType;
+        List<String> classVars;
+
+        IdInfo(String idResPrefix, String resType, List<String> classVars) {
+            this.idResPrefix = idResPrefix;
+            this.resType = resType;
+            this.classVars = classVars;
+        }
     }
 }
