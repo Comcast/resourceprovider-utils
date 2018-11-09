@@ -81,6 +81,6 @@ class RpKtCodeGenerator {
         val kotlinFile = kotlinFileBuilder.build()
 
         val kaptKotlinGeneratedDir = processingEnv.options["kapt.kotlin.generated"]
-        kotlinFile.writeTo(File(kaptKotlinGeneratedDir, "${kotlinFile.name}.kt"))
+        kotlinFile.writeTo(File(kaptKotlinGeneratedDir))
     }
 }
