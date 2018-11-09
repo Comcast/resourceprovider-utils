@@ -3,7 +3,7 @@ Android Resource Provider
 
 A Java annotation processor that builds a ResourceProvider class which contains an API to get Android Resources
  
- The ResouceProvider class currently provides APIs for R.string, R.plurals, and R.drawable elements.  
+ The ResourceProvider class currently provides APIs for R.string, R.plurals, and R.drawable elements.  
  Future releases will include support for other types of resources.
    
    Resource Provider allows the presentation layer in your MVP implemenation to explicitly control presentation details
