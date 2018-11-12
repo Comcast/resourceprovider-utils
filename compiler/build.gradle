@@ -32,6 +32,8 @@ signing {
     sign configurations.archives
 }
 
+project.archivesBaseName = "$rootProject.artifactPrefix-compiler"
+
 uploadArchives {
     repositories {
         mavenDeployer {

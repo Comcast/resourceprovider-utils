@@ -5,11 +5,6 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
 import com.sun.tools.javac.code.Symbol;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
@@ -17,11 +12,16 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedOptions;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static com.squareup.javapoet.JavaFile.builder;
 import static com.xfinity.resourceprovider.Utils.getPackageName;
-import static java.util.Collections.singleton;
 import static javax.lang.model.SourceVersion.latestSupported;
 
 @AutoService(Processor.class)
@@ -49,7 +49,10 @@ public class RpProcessor extends AbstractProcessor {
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {
-        return singleton(RpApplication.class.getCanonicalName());
+        Set<String> annotations = new HashSet<>();
+        annotations.add(RpApplication.class.getCanonicalName());
+        annotations.add(RpTest.class.getCanonicalName());
+        return annotations;
     }
 
     @Override
@@ -143,6 +146,14 @@ public class RpProcessor extends AbstractProcessor {
             }
         }
 
+        for (Element annotatedElement : roundEnv.getElementsAnnotatedWith(RpTest.class)) {
+            PackageElement packageElement = processingEnv.getElementUtils().getPackageOf(annotatedElement);
+            String packageName = packageElement.toString();
+
+            boolean generateIdProvider = annotatedElement.getAnnotation(RpTest.class).generateIdProvider();
+            new RpKtCodeGenerator().generateTestUtils(packageName, processingEnv, generateIdProvider);
+        }
+
         return true;
     }
 
@@ -189,15 +200,6 @@ public class RpProcessor extends AbstractProcessor {
         TypeSpec resourceProviderClass = codeGenerator.generateResourceProviderClass(generateIdProvider);
         JavaFile resourceProviderJavaFile = builder(packageName, resourceProviderClass).build();
         resourceProviderJavaFile.writeTo(processingEnv.getFiler());
-
-        try {
-            //if the client has included the testutils lib, generate the test utils
-            Class.forName("com.xfinity.resourceprovider.testutils.StringProviderAnswer");
-            new RpKtCodeGenerator().generateTestUtils(resourceProviderJavaFile.packageName, processingEnv,
-                                                      generateIdProvider);
-        } catch (ClassNotFoundException ignored) {
-            //ignore
-        }
     }
 }
 

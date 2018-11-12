@@ -1,5 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'maven'
+apply plugin: 'signing'
 
 android {
     compileSdkVersion 28
@@ -35,4 +37,68 @@ dependencies {
 
 repositories {
     mavenCentral()
+}
+
+task sourceJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier "source"
+}
+
+//Creating sources with comments
+task androidSourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.srcDirs
+}
+
+artifacts {
+    archives androidSourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+project.archivesBaseName = "$rootProject.artifactPrefix-testutils"
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: sonatypeUsername, password: sonatypePassword)
+            }
+
+            pom.project {
+                groupId rootProject.groupId
+                name "$rootProject.projectName Test Utils"
+                version rootProject.publishVersion
+                packaging 'aar'
+                description 'Test Utitlities for Resource Provider, an MVP Resources API for Android'
+                artifactId "$rootProject.artifactPrefix-testutils"
+                url 'https://github.com/Comcast/resourceprovider'
+
+                scm {
+                    url 'scm:git@github.com:Comcast/resourceprovider.git'
+                    connection 'scm:git@github.com:Comcast/resourceprovider.git'
+                    developerConnection 'scm:git@github.com:Comcast/resourceprovider.git'
+                }
+
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution 'repo'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'dapp'
+                        name 'Mark Dappollone'
+                    }
+                }
+            }
+        }
+    }
 }

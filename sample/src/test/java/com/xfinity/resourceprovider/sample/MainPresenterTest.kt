@@ -1,5 +1,6 @@
 package com.xfinity.resourceprovider.sample
 
+import com.xfinity.resourceprovider.RpTest
 import com.xfinity.resourceprovider.testutils.mock
 import org.junit.Before
 import org.junit.Test
@@ -13,7 +14,7 @@ import java.util.Calendar
 @RunWith(MockitoJUnitRunner.Silent::class)
 class MainPresenterTest {
     @Mock private lateinit var mainView: MainView
-    @Mock private lateinit var resourceProvider: ResourceProvider
+    @Mock @RpTest private lateinit var resourceProvider: ResourceProvider
     private lateinit var presenter: MainPresenter
 
     @Before
@@ -47,7 +48,6 @@ class MainPresenterTest {
         verify<MainView>(mainView)
                 .setIdText("The Id TextView id is " + resourceProvider.ids.idTextId)
     }
-
 
     @Test
     fun date_presents_correctly() {
