@@ -35,7 +35,7 @@ final class RpCodeGenerator {
     private final AnnotationSpec suppressLint = AnnotationSpec.builder(ClassName.get("android.annotation", "SuppressLint"))
                                                .addMember("value", "$L", "{\"StringFormatInvalid\", \"StringFormatMatches\"}")
                                                .build();
-    private TypeName contextCompatClassName = get("android.support.v4.content", "ContextCompat");
+    private TypeName contextCompatClassName = get("androidx.core.content", "ContextCompat");
 
     RpCodeGenerator(String packageName, List<String> rClassStringVars, List<String> rClassPluralVars, List<String> rClassDrawableVars,
                     List<String> rClassDimenVars, List<String> rClassIntegerVars, List<String> rClassColorVars,
