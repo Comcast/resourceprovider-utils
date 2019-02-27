@@ -1,10 +1,10 @@
-Android Resource Provider - BETA
+Android Resource Provider
 ======================
 
 A Java annotation processor that builds a ResourceProvider class which contains an API to get Android Resources
  
- The ResouceProvider class currently only provides APIs for R.string elements.
-   Future releases will include support for other types of resources.
+ The ResourceProvider class currently provides APIs for R.string, R.plurals, and R.drawable elements.  
+ Future releases will include support for other types of resources.
    
    Resource Provider allows the presentation layer in your MVP implemenation to explicitly control presentation details
    without needing access or knowledge of Android's Context or R classes. Resource Provider automatically generates an
@@ -21,8 +21,54 @@ A Java annotation processor that builds a ResourceProvider class which contains 
    The resourceprovider-compiler will generate the API:
    
    ```java
-   public String getOneArgFormattedString(Object... formatArgs)
+   public String getOneArgFormattedString(Object... formatArgs) { ... }
    ```
+   
+   For any plural:
+   
+   ```xml
+   <plurals name="days_until_friday">
+        <item quantity="one">Only 1 day until Friday!</item>
+        <item quantity="other">%d days until Friday</item>
+   </plurals>
+   ```
+  
+   resourceprovider-compiler will generate the API:
+   
+   ```Java
+   public String getDaysUntilFridayQuantityString(int quantity, Object... formatArgs) { ... }
+   ```
+   
+   And for any drawable file
+   
+   ```xml
+    any_drawable.png ( or any_drawable.xml)
+   ```
+
+   The resourceprovider-compiler will generate the API:
+   
+   ```java
+   public Drawable getAnyDrawable() { ... } 
+   ```
+   
+  Calling ResourceProvider APIS
+  =============================
+  In order to avoid conflicts with duplicate resource ids, ResourceProvider organizes its APIs into delegate providers for
+  each resource type.  To call a ResourceProvider API, clients will make a call in the format:
+  
+  ```java
+  resourceProvider.get<resource_type>().get<resource_name>()
+  ```
+  
+  For example, to get a String resource:
+  ```java
+  resourceProvider.getStrings().getSomeString()
+  ```
+   
+  And for a color
+  ```java
+  resourceProvider.getColors().getSomeColor()
+  ```
    
   Setup
   ======================
@@ -46,5 +92,23 @@ A Java annotation processor that builds a ResourceProvider class which contains 
    ```xml
    kapt "com.xfinity:resourceprovider-compiler:<version>"
    ``` 
+   Also, when using kapt, don't forget to include 
+   
+   ```xml
+   kapt {
+    correctErrorTypes = true
+   }
+   ```
+   For compatibility with other annotation processors, like Dagger
    
    This library used the https://github.com/jenzz/Android-StaticLauncher project as a template. 
+
+  Id Provider
+  ======================
+  ResourceProvider will, by default, generate a provider class with APIs to get the integer IDs of all the supported
+  resource types.  Since this will add a large number of APIs to the method count of your app, you can disable generation
+  of the Id Provider by passing a parameter to the RpApplication annotation:
+  
+   ```java
+  @RpApplication(generateIdProvider = false)
+  ```

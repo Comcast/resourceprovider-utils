@@ -3,7 +3,7 @@ package com.xfinity.resourceprovider.sample;
 import java.util.Calendar;
 
 class MainPresenter {
-    private static final int FORMAT_ARG = 10000;
+    static final int FORMAT_ARG = 10000;
     private static final int MONTH_HALFWAY_POINT = 15;
 
     private final ResourceProvider resourceProvider;
@@ -18,23 +18,27 @@ class MainPresenter {
     }
 
     void present() {
-        mainView.setFormattedText(resourceProvider.getOneArgFormattedString(FORMAT_ARG));
+        mainView.setFormattedText(resourceProvider.getStrings().getOneArgFormattedString(FORMAT_ARG));
 
         Calendar today = Calendar.getInstance();
         if (today.get(Calendar.DAY_OF_MONTH) > MONTH_HALFWAY_POINT) {
-            mainView.setDateString(resourceProvider.getSecondHalfOfMonth());
+            mainView.setDateString(resourceProvider.getStrings().getSecondHalfOfMonth());
         } else {
-            mainView.setDateString(resourceProvider.getFirstHalfOfMonth());
+            mainView.setDateString(resourceProvider.getStrings().getFirstHalfOfMonth());
         }
 
         int dayOfWeek = today.get(Calendar.DAY_OF_WEEK);
         int daysUntilFriday = Calendar.FRIDAY - dayOfWeek;
         if (daysUntilFriday >= 0) {
-            mainView.setPluralsString(resourceProvider.getDaysUntilFridayQuantityString(daysUntilFriday, daysUntilFriday));
+            mainView.setPluralsString(resourceProvider.getStrings().getDaysUntilFridayQuantityString(daysUntilFriday, daysUntilFriday));
         } else {
-            mainView.setPluralsString(resourceProvider.getSaturday());
+            mainView.setPluralsString(resourceProvider.getStrings().getSaturday());
         }
 
-        mainView.setDrawable(resourceProvider.getIcnNavDino());
+        mainView.setDrawable(resourceProvider.getDrawables().getIcnNavDino());
+        mainView.setDimenText("The Test Dimen is " + resourceProvider.getDimens().getTestDimenPixelSize() + " in pixels");
+        mainView.setIntegerText("The Test Integer is " + resourceProvider.getIntegers().getTestInteger());
+        mainView.setIdText("The Id TextView id is " + resourceProvider.getIds().getIdTextId());
+        mainView.setColorViewBackgroundColor(resourceProvider.getColors().getBabyBlue());
     }
 }

@@ -1,25 +1,52 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+
+kapt {
+    correctErrorTypes = true
+    generateStubs = true
+}
 
 android {
-  compileSdkVersion 25
-  buildToolsVersion '25.0.3'
+    compileSdkVersion 28
+    buildToolsVersion '28.0.3'
 
-  defaultConfig {
-    applicationId 'com.xfinity.resourcemanager.sample'
-    minSdkVersion 15
-    targetSdkVersion 25
-    versionCode 1
-    versionName rootProject.publishVersion
-  }
+    defaultConfig {
+        applicationId 'com.xfinity.resourceprovider.sample'
+        minSdkVersion 15
+        targetSdkVersion 28
+        versionCode 1
+        versionName rootProject.publishVersion
+    }
+
+    lintOptions {
+        disable 'InvalidPackage'
+    }
 }
 
 dependencies {
-  compile 'com.android.support:appcompat-v7:25.3.1'
-  compile 'com.jakewharton:butterknife:6.1.0'
+    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'com.jakewharton:butterknife:8.7.0'
+    implementation 'com.nhaarman:mockito-kotlin:1.6.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
-  compile project(':library')
-  annotationProcessor project(':compiler')
+    compile project(':library')
 
-  testCompile 'junit:junit:4.12',
-              'org.mockito:mockito-core:2.7.21'
+    kapt project(':compiler')
+
+    testCompile 'junit:junit:4.12',
+                'org.mockito:mockito-core:2.7.21',
+                project(':testutils'),
+                project(':library')
+
+    testImplementation('com.nhaarman:mockito-kotlin:1.4.0',
+                       {
+                           exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib'
+                           exclude group: 'org.jetbrains.kotlin', module: 'kotlin-reflect'
+                       })
+
+    kaptTest project(':compiler')
+}
+repositories {
+    mavenCentral()
 }
