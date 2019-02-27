@@ -84,6 +84,11 @@ public class RpProcessor extends AbstractProcessor {
                 String rClassName = packageName + R_CLASS_IDENTIFIER;
 
                 boolean generateIdProvider = annotatedElement.getAnnotation(RpApplication.class).generateIdProvider();
+                boolean generateStringProvider = annotatedElement.getAnnotation(RpApplication.class).generateStringProvider();
+                boolean generateColorProvider = annotatedElement.getAnnotation(RpApplication.class).generateColorProvider();
+                boolean generateDrawableProvider = annotatedElement.getAnnotation(RpApplication.class).generateDrawableProvider();
+                boolean generateIntegerProvider = annotatedElement.getAnnotation(RpApplication.class).generateIntegerProvider();
+                boolean generateDimensionProvider = annotatedElement.getAnnotation(RpApplication.class).generateDimensionProvider();
                 roundEnv.getRootElements().stream().filter(element -> element instanceof TypeElement).forEach(element -> {
                     TypeElement typeElement = (TypeElement) element;
                     if (typeElement.getQualifiedName().toString().equals(rClassName)) {
@@ -91,40 +96,50 @@ public class RpProcessor extends AbstractProcessor {
                                .filter(enclosedElement -> enclosedElement instanceof TypeElement)
                                .forEach(enclosedElement -> {
                                    List<? extends Element> enclosedElements = enclosedElement.getEnclosedElements();
-                                   if (enclosedElement.getSimpleName().toString().equals(STRING)) {
-                                       enclosedElements.stream()
-                                                       .filter(stringElement -> stringElement instanceof Symbol.VarSymbol)
-                                                       .forEach(stringElement -> rStringVars.add(stringElement.toString()));
+                                   if (generateStringProvider) {
+                                       if (enclosedElement.getSimpleName().toString().equals(STRING)) {
+                                           enclosedElements.stream()
+                                                   .filter(stringElement -> stringElement instanceof Symbol.VarSymbol)
+                                                   .forEach(stringElement -> rStringVars.add(stringElement.toString()));
+                                       }
+
+                                       if (enclosedElement.getSimpleName().toString().equals(PLURALS)) {
+                                           enclosedElements.stream()
+                                                   .filter(pluralsElement -> pluralsElement instanceof Symbol.VarSymbol)
+                                                   .forEach(pluralsElement -> rPluralVars.add(pluralsElement.toString()));
+                                       }
                                    }
 
-                                   if (enclosedElement.getSimpleName().toString().equals(PLURALS)) {
-                                       enclosedElements.stream()
-                                                       .filter(pluralsElement -> pluralsElement instanceof Symbol.VarSymbol)
-                                                       .forEach(pluralsElement -> rPluralVars.add(pluralsElement.toString()));
+                                   if (generateDrawableProvider) {
+                                       if (enclosedElement.getSimpleName().toString().equals(DRAWABLE)) {
+                                           enclosedElements.stream()
+                                                   .filter(drawableElement -> drawableElement instanceof Symbol.VarSymbol)
+                                                   .forEach(drawableElement -> rDrawableVars.add(drawableElement.toString()));
+                                       }
                                    }
 
-                                   if (enclosedElement.getSimpleName().toString().equals(DRAWABLE)) {
-                                       enclosedElements.stream()
-                                               .filter(drawableElement -> drawableElement instanceof Symbol.VarSymbol)
-                                               .forEach(drawableElement -> rDrawableVars.add(drawableElement.toString()));
+                                   if (generateDimensionProvider) {
+                                       if (enclosedElement.getSimpleName().toString().equals(DIMEN)) {
+                                           enclosedElements.stream()
+                                                   .filter(dimenElement -> dimenElement instanceof Symbol.VarSymbol)
+                                                   .forEach(dimenElement -> rDimenVars.add(dimenElement.toString()));
+                                       }
                                    }
 
-                                   if (enclosedElement.getSimpleName().toString().equals(DIMEN)) {
-                                       enclosedElements.stream()
-                                                       .filter(dimenElement -> dimenElement instanceof Symbol.VarSymbol)
-                                                       .forEach(dimenElement -> rDimenVars.add(dimenElement.toString()));
+                                   if (generateIntegerProvider) {
+                                       if (enclosedElement.getSimpleName().toString().equals(INTEGER)) {
+                                           enclosedElements.stream()
+                                                   .filter(integerElement -> integerElement instanceof Symbol.VarSymbol)
+                                                   .forEach(integerElement -> rIntegerVars.add(integerElement.toString()));
+                                       }
                                    }
 
-                                   if (enclosedElement.getSimpleName().toString().equals(INTEGER)) {
-                                       enclosedElements.stream()
-                                                       .filter(integerElement -> integerElement instanceof Symbol.VarSymbol)
-                                                       .forEach(integerElement -> rIntegerVars.add(integerElement.toString()));
-                                   }
-
-                                   if (enclosedElement.getSimpleName().toString().equals(COLOR)) {
-                                       enclosedElements.stream()
-                                                       .filter(colorElement -> colorElement instanceof Symbol.VarSymbol)
-                                                       .forEach(colorElement -> rColorVars.add(colorElement.toString()));
+                                   if (generateColorProvider) {
+                                       if (enclosedElement.getSimpleName().toString().equals(COLOR)) {
+                                           enclosedElements.stream()
+                                                   .filter(colorElement -> colorElement instanceof Symbol.VarSymbol)
+                                                   .forEach(colorElement -> rColorVars.add(colorElement.toString()));
+                                       }
                                    }
 
                                    if (generateIdProvider) {
@@ -170,26 +185,6 @@ public class RpProcessor extends AbstractProcessor {
         RpCodeGenerator codeGenerator = new RpCodeGenerator(packageName, rStringVars, rPluralVars, rDrawableVars, rDimenVars,
                                                             rIntegerVars, rColorVars, rIdVars);
 
-        TypeSpec stringProviderClass = codeGenerator.generateStringProviderClass();
-        JavaFile stringProviderJavaFile = builder(packageName, stringProviderClass).build();
-        stringProviderJavaFile.writeTo(processingEnv.getFiler());
-
-        TypeSpec dimenProviderClass = codeGenerator.generateDimensionProviderClass();
-        JavaFile dimenProviderJavaFile = builder(packageName, dimenProviderClass).build();
-        dimenProviderJavaFile.writeTo(processingEnv.getFiler());
-
-        TypeSpec colorProviderClass = codeGenerator.generateColorProviderClass();
-        JavaFile colorProviderJavaFile = builder(packageName, colorProviderClass).build();
-        colorProviderJavaFile.writeTo(processingEnv.getFiler());
-
-        TypeSpec drawableProviderClass = codeGenerator.generateDrawableProviderClass();
-        JavaFile drawableProviderJavaFile = builder(packageName, drawableProviderClass).build();
-        drawableProviderJavaFile.writeTo(processingEnv.getFiler());
-
-        TypeSpec integerProviderClass = codeGenerator.generateIntegerProviderClass();
-        JavaFile integerProviderJavaFile = builder(packageName, integerProviderClass).build();
-        integerProviderJavaFile.writeTo(processingEnv.getFiler());
-
         boolean generateIdProvider = rIdVars.size() > 0;
         if (generateIdProvider) {
             TypeSpec idProviderClass = codeGenerator.generateIdProviderClass();
@@ -197,7 +192,49 @@ public class RpProcessor extends AbstractProcessor {
             idProviderJavaFile.writeTo(processingEnv.getFiler());
         }
 
-        TypeSpec resourceProviderClass = codeGenerator.generateResourceProviderClass(generateIdProvider);
+        boolean generateIntegerProvider = rIntegerVars.size() > 0;
+        if (generateIntegerProvider) {
+            TypeSpec integerProviderClass = codeGenerator.generateIntegerProviderClass();
+            JavaFile integerProviderJavaFile = builder(packageName, integerProviderClass).build();
+            integerProviderJavaFile.writeTo(processingEnv.getFiler());
+        }
+
+        boolean generateDimensionProvider = rDimenVars.size() > 0;
+        if (generateDimensionProvider) {
+            TypeSpec dimensionProviderClass = codeGenerator.generateDimensionProviderClass();
+            JavaFile dimensionProviderJavaFile = builder(packageName, dimensionProviderClass).build();
+            dimensionProviderJavaFile.writeTo(processingEnv.getFiler());
+        }
+
+        boolean generateColorProvider = rColorVars.size() > 0;
+        if (generateColorProvider) {
+            TypeSpec colorProviderClass = codeGenerator.generateColorProviderClass();
+            JavaFile colorProviderJavaFile = builder(packageName, colorProviderClass).build();
+            colorProviderJavaFile.writeTo(processingEnv.getFiler());
+        }
+
+        boolean generateDrawableProvider = rDrawableVars.size() > 0;
+        if (generateDrawableProvider) {
+            TypeSpec drawableProviderClass = codeGenerator.generateDrawableProviderClass();
+            JavaFile drawableProviderJavaFile = builder(packageName, drawableProviderClass).build();
+            drawableProviderJavaFile.writeTo(processingEnv.getFiler());
+        }
+
+        boolean generateStringProvider = rDrawableVars.size() > 0;
+        if (generateStringProvider) {
+            TypeSpec stringProviderClass = codeGenerator.generateStringProviderClass();
+            JavaFile stringProviderJavaFile = builder(packageName, stringProviderClass).build();
+            stringProviderJavaFile.writeTo(processingEnv.getFiler());
+        }
+
+        TypeSpec resourceProviderClass = codeGenerator.generateResourceProviderClass(
+                generateIdProvider,
+                generateIntegerProvider,
+                generateDimensionProvider,
+                generateColorProvider,
+                generateDrawableProvider,
+                generateStringProvider);
+
         JavaFile resourceProviderJavaFile = builder(packageName, resourceProviderClass).build();
         resourceProviderJavaFile.writeTo(processingEnv.getFiler());
     }

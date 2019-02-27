@@ -50,19 +50,39 @@ final class RpCodeGenerator {
         this.rClassIdVars = rClassIdVars;
     }
 
-    TypeSpec generateResourceProviderClass(boolean generateIdProvider) {
+    TypeSpec generateResourceProviderClass(boolean generateIdProvider,
+                                           boolean generateIntegerProvider,
+                                           boolean generateDimensionProvider,
+                                           boolean generateColorProvider,
+                                           boolean generateDrawableProvider,
+                                           boolean generateStringProvider) {
         MethodSpec.Builder constructorBuilder = MethodSpec.constructorBuilder()
                                            .addModifiers(PUBLIC)
                                            .addParameter(contextClassName, "context")
-                                           .addStatement("this.context = context")
-                                           .addStatement("this.stringProvider = new StringProvider(context)")
-                                           .addStatement("this.drawableProvider = new DrawableProvider(context)")
-                                           .addStatement("this.colorProvider = new ColorProvider(context)")
-                                           .addStatement("this.dimenProvider = new DimensionProvider(context)")
-                                           .addStatement("this.integerProvider = new IntegerProvider(context)");
+                                           .addStatement("this.context = context");
 
         if (generateIdProvider) {
             constructorBuilder.addStatement("this.idProvider = new IdProvider(context)");
+        }
+
+        if (generateIntegerProvider) {
+            constructorBuilder.addStatement("this.integerProvider = new IntegerProvider(context)");
+        }
+
+        if (generateDrawableProvider) {
+            constructorBuilder.addStatement("this.drawableProvider = new DrawableProvider(context)");
+        }
+
+        if (generateColorProvider) {
+            constructorBuilder.addStatement("this.colorProvider = new ColorProvider(context)");
+        }
+
+        if (generateDimensionProvider) {
+            constructorBuilder.addStatement("this.dimenProvider = new DimensionProvider(context)");
+        }
+
+        if (generateStringProvider) {
+            constructorBuilder.addStatement("this.stringProvider = new StringProvider(context)");
         }
 
         MethodSpec constructor = constructorBuilder.build();
@@ -129,21 +149,36 @@ final class RpCodeGenerator {
         TypeSpec.Builder classBuilder = classBuilder("ResourceProvider")
                 .addModifiers(PUBLIC)
                 .addField(contextField)
-                .addMethods(Arrays.asList(constructor,
-                                          getStringMethodSpec,
-                                          getColorMethodSpec,
-                                          getDrawableMethodSpec,
-                                          getDimenMethodSpec,
-                                          getIntegerMethodSpec))
-                .addField(stringProvider)
-                .addField(drawableProvider)
-                .addField(colorProvider)
-                .addField(dimenProvider)
-                .addField(integerProvider);
+                .addMethods(Arrays.asList(constructor));
 
         if (generateIdProvider) {
             classBuilder.addMethod(getIdMethodSpec);
             classBuilder.addField(idProvider);
+        }
+
+        if (generateIntegerProvider) {
+            classBuilder.addMethod(getIntegerMethodSpec);
+            classBuilder.addField(integerProvider);
+        }
+
+        if (generateDrawableProvider) {
+            classBuilder.addMethod(getDrawableMethodSpec);
+            classBuilder.addField(drawableProvider);
+        }
+
+        if (generateColorProvider) {
+            classBuilder.addMethod(getColorMethodSpec);
+            classBuilder.addField(colorProvider);
+        }
+
+        if (generateDimensionProvider) {
+            classBuilder.addMethod(getDimenMethodSpec);
+            classBuilder.addField(dimenProvider);
+        }
+
+        if (generateStringProvider) {
+            classBuilder.addMethod(getStringMethodSpec);
+            classBuilder.addField(stringProvider);
         }
 
         return classBuilder.build();
