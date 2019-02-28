@@ -149,7 +149,7 @@ final class RpCodeGenerator {
         TypeSpec.Builder classBuilder = classBuilder("ResourceProvider")
                 .addModifiers(PUBLIC)
                 .addField(contextField)
-                .addMethods(Arrays.asList(constructor));
+                .addMethod(constructor);
 
         if (generateIdProvider) {
             classBuilder.addMethod(getIdMethodSpec);
