@@ -103,12 +103,15 @@ A Java annotation processor that builds a ResourceProvider class which contains 
    
    This library used the https://github.com/jenzz/Android-StaticLauncher project as a template. 
 
-  Id Provider
+  Provider Generation Configs
   ======================
-  ResourceProvider will, by default, generate a provider class with APIs to get the integer IDs of all the supported
-  resource types.  Since this will add a large number of APIs to the method count of your app, you can disable generation
-  of the Id Provider by passing a parameter to the RpApplication annotation:
+  ResourceProvider will, by default, generate a provider class with APIs to get all the resource types mentioned above, and integer IDs of all the supported resource types.  Since this will add a large number of APIs to the method count of your app, you can disable generation of any of the Provider Classes by passing a parameter to the RpApplication annotation:
   
    ```java
-  @RpApplication(generateIdProvider = false)
+  @RpApplication(generateIdProvider = false, 
+                 generateIntegerProvider = false,
+                 generateDimensionProvider = false,
+                 generateColorProvider = false,
+                 generateDrawableProvider = false,
+                 generateStringProvider = false)
   ```
