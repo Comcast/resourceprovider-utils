@@ -18,7 +18,7 @@ allprojects {
     }
 
     group = 'com.xfinity'
-    version = '1.0.1'
+    version = '1.1.0'
 }
 
 ext {
@@ -26,6 +26,6 @@ ext {
     artifactPrefix = 'resourceprovider'
     groupId = 'com.xfinity'
     uploadName = 'Resource-Provider'
-    publishVersion = '1.0.1'
+    publishVersion = '1.1.0'
     description = 'Utility for Auto-Generating an Android-Agnostic Resource Provider API'
 }
