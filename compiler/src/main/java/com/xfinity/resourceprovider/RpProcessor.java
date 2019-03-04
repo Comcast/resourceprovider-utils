@@ -62,6 +62,9 @@ public class RpProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+        String useSupportLibraryString = processingEnv.getOptions().get("resourceProvider.useSupportLibrary");
+        boolean useJetpack = !"true".equals(useSupportLibraryString);
+
         for (Element annotatedElement : roundEnv.getElementsAnnotatedWith(RpApplication.class)) {
 
             // annotation is only allowed on classes, so we can safely cast here
@@ -153,7 +156,7 @@ public class RpProcessor extends AbstractProcessor {
                     }
                 });
 
-                generateCode(annotatedClass, rStringVars, rPluralVars, rDrawableVars, rDimenVars, rIntegerVars,
+                generateCode(annotatedClass, useJetpack, rStringVars, rPluralVars, rDrawableVars, rDimenVars, rIntegerVars,
                              rColorVars, rIdVars);
             } catch (UnnamedPackageException | IOException e) {
                 messager.error(annotatedElement, "Couldn't generate class for %s: %s", annotatedClass,
@@ -177,12 +180,18 @@ public class RpProcessor extends AbstractProcessor {
         return processingEnv.getTypeUtils().isAssignable(annotatedClass.asType(), applicationTypeElement.asType());
     }
 
-    private void generateCode(TypeElement annotatedClass, List<String> rStringVars, List<String> rPluralVars,
-                              List<String> rDrawableVars, List<String> rDimenVars, List<String> rIntegerVars,
-                              List<String> rColorVars, List<String> rIdVars)
+    private void generateCode(TypeElement annotatedClass,
+                              boolean useJetpack,
+                              List<String> rStringVars,
+                              List<String> rPluralVars,
+                              List<String> rDrawableVars,
+                              List<String> rDimenVars,
+                              List<String> rIntegerVars,
+                              List<String> rColorVars,
+                              List<String> rIdVars)
             throws UnnamedPackageException, IOException {
         String packageName = getPackageName(processingEnv.getElementUtils(), annotatedClass);
-        RpCodeGenerator codeGenerator = new RpCodeGenerator(packageName, rStringVars, rPluralVars, rDrawableVars, rDimenVars,
+        RpCodeGenerator codeGenerator = new RpCodeGenerator(packageName, useJetpack, rStringVars, rPluralVars, rDrawableVars, rDimenVars,
                                                             rIntegerVars, rColorVars, rIdVars);
 
         boolean generateIdProvider = rIdVars.size() > 0;

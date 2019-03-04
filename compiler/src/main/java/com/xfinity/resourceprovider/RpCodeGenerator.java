@@ -35,10 +35,16 @@ final class RpCodeGenerator {
     private final AnnotationSpec suppressLint = AnnotationSpec.builder(ClassName.get("android.annotation", "SuppressLint"))
                                                .addMember("value", "$L", "{\"StringFormatInvalid\", \"StringFormatMatches\"}")
                                                .build();
-    private TypeName contextCompatClassName = get("androidx.core.content", "ContextCompat");
+    private TypeName contextCompatClassName;
 
-    RpCodeGenerator(String packageName, List<String> rClassStringVars, List<String> rClassPluralVars, List<String> rClassDrawableVars,
-                    List<String> rClassDimenVars, List<String> rClassIntegerVars, List<String> rClassColorVars,
+    RpCodeGenerator(String packageName,
+                    boolean useJetpack,
+                    List<String> rClassStringVars,
+                    List<String> rClassPluralVars,
+                    List<String> rClassDrawableVars,
+                    List<String> rClassDimenVars,
+                    List<String> rClassIntegerVars,
+                    List<String> rClassColorVars,
                     List<String> rClassIdVars) {
         this.packageName = packageName;
         this.rClassStringVars = rClassStringVars;
@@ -48,6 +54,10 @@ final class RpCodeGenerator {
         this.rClassIntegerVars = rClassIntegerVars;
         this.rClassColorVars = rClassColorVars;
         this.rClassIdVars = rClassIdVars;
+
+        this.contextCompatClassName = useJetpack ?
+                get("androidx.core.content", "ContextCompat") :
+                get("android.support.v4.content", "ContextCompat");
     }
 
     TypeSpec generateResourceProviderClass(boolean generateIdProvider,
