@@ -8,11 +8,12 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
-import com.sun.tools.javac.util.Pair;
 
-import javax.lang.model.element.Modifier;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.lang.model.element.Modifier;
 
 import static com.squareup.javapoet.ClassName.get;
 import static com.squareup.javapoet.TypeName.INT;
@@ -197,31 +198,37 @@ final class RpCodeGenerator {
                 .addMethod(constructor)
                 .addAnnotation(suppressLint);
 
+        List<String> stringGetterSuffixes = new ArrayList<>();
+
         for (String var : rClassStringVars) {
             TypeName objectVarArgsType = ArrayTypeName.get(Object[].class);
             ParameterSpec parameterSpec = ParameterSpec.builder(objectVarArgsType, "formatArgs").build();
 
             try {
-                classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix(var))
+                String getterSuffix = getterSuffix(var, stringGetterSuffixes);
+                classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix)
                                                  .addModifiers(Modifier.PUBLIC)
                                                  .addParameter(parameterSpec)
                                                  .returns(String.class)
                                                  .addStatement("return context.getString(R.string." + var + ", formatArgs)")
                                                  .varargs(true)
                                                  .build());
+                stringGetterSuffixes.add(getterSuffix);
             } catch (IllegalArgumentException e) {
                 System.out.println("\n\nResourceProvider Compiler Error: " + e.getMessage() + ".\n\nUnable to generate API for R.string." + var + "\n\n") ;
             }
 
         }
 
+        List<String> pluralsGetterSuffixes = new ArrayList<>();
         for (String var : rClassPluralVars) {
             TypeName objectVarArgsType = ArrayTypeName.get(Object[].class);
             ParameterSpec formatArgsParameterSpec = ParameterSpec.builder(objectVarArgsType, "formatArgs").build();
             ParameterSpec quantityParameterSpec = ParameterSpec.builder(INT, "quantity").build();
 
             try {
-                classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix(var) + "QuantityString")
+                String getterSuffix = getterSuffix(var, pluralsGetterSuffixes);
+                classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix + "QuantityString")
                                                  .addModifiers(Modifier.PUBLIC)
                                                  .addParameter(quantityParameterSpec)
                                                  .addParameter(formatArgsParameterSpec)
@@ -229,6 +236,7 @@ final class RpCodeGenerator {
                                                  .addStatement("return context.getResources().getQuantityString(R.plurals." + var + ", quantity, formatArgs)")
                                                  .varargs(true)
                                                  .build());
+                pluralsGetterSuffixes.add(getterSuffix);
             } catch (IllegalArgumentException e) {
                 System.out.println("\n\nResourceProvider Compiler Error: " + e.getMessage() + ".\n\nUnable to generate API for R.plurals." + var + "\n\n") ;
             }
@@ -252,14 +260,17 @@ final class RpCodeGenerator {
                 .addMethod(constructor)
                 .addAnnotation(suppressLint);
 
+        List<String> getterSuffixes = new ArrayList<>();
         for (String var : rClassDrawableVars) {
             try {
-                classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix(var))
+                String getterSuffix = getterSuffix(var, getterSuffixes);
+                classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix)
                                                  .addModifiers(Modifier.PUBLIC)
                                                  .returns(drawableClassName)
                                                  .addStatement("return $T.getDrawable(context, R.drawable." + var + ")", contextCompatClassName)
                                                  .varargs(false)
                                                  .build());
+                getterSuffixes.add(getterSuffix);
             } catch (IllegalArgumentException e) {
                 System.out.println("\n\nResourceProvider Compiler Error: " + e.getMessage() + ".\n\nUnable to generate API for R.drawable." + var + "\n\n") ;
             }
@@ -282,14 +293,17 @@ final class RpCodeGenerator {
                 .addMethod(constructor)
                 .addAnnotation(suppressLint);
 
+        List<String> getterSuffixes = new ArrayList<>();
         for (String var : rClassColorVars) {
             try {
-                classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix(var))
+                String getterSuffix = getterSuffix(var, getterSuffixes);
+                classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix)
                                                  .addModifiers(Modifier.PUBLIC)
                                                  .returns(INT)
                                                  .addStatement("return $T.getColor(context, R.color." + var + ")", contextCompatClassName)
                                                  .varargs(false)
                                                  .build());
+                getterSuffixes.add(getterSuffix);
             } catch (IllegalArgumentException e) {
                 System.out.println("\n\nResourceProvider Compiler Error: " + e.getMessage() + ".\n\nUnable to generate API for R.color." + var + "\n\n") ;
             }
@@ -311,15 +325,17 @@ final class RpCodeGenerator {
                 .addMethod(constructor)
                 .addAnnotation(suppressLint);
 
-
+        List<String> getterSuffixes = new ArrayList<>();
         for (String var : rClassIntegerVars) {
             try {
-                classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix(var))
+                String getterSuffix = getterSuffix(var, getterSuffixes);
+                classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix)
                                                  .addModifiers(Modifier.PUBLIC)
                                                  .returns(INT)
                                                  .addStatement("return context.getResources().getInteger(R.integer." + var + ")")
                                                  .varargs(false)
                                                  .build());
+                getterSuffixes.add(getterSuffix);
             } catch (IllegalArgumentException e) {
                 System.out.println("\n\nResourceProvider Compiler Error: " + e.getMessage() + ".\n\nUnable to generate API for R.int." + var + "\n\n") ;
             }
@@ -351,15 +367,18 @@ final class RpCodeGenerator {
                                                 new IdInfo("R.integer.", "Integer", rClassIntegerVars),
                                                 new IdInfo("R.color.", "Color", rClassColorVars));
 
+        List<String> getterSuffixes = new ArrayList<>();
         for (IdInfo info : idInfoList) {
             for (String var : info.classVars) {
                 try {
-                    classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix(var) + info.resType + "Id")
+                    String getterSuffix = getterSuffix(var, getterSuffixes);
+                    classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix + info.resType + "Id")
                                                      .addModifiers(Modifier.PUBLIC)
                                                      .returns(INT)
                                                      .addStatement("return " + info.idResPrefix + var)
                                                      .varargs(false)
                                                      .build());
+                    getterSuffixes.add(getterSuffix);
                 } catch (IllegalArgumentException e) {
                     System.out.println("\n\nResourceProvider Compiler Error: " + e.getMessage() + ".\n\nUnable to generate API for " + info.idResPrefix + var + "\n\n");
                 }
@@ -382,16 +401,18 @@ final class RpCodeGenerator {
                 .addMethod(constructor)
                 .addAnnotation(suppressLint);
 
-
+        List<String> getterSuffixes = new ArrayList<>();
         for (String var : rClassDimenVars) {
             try {
-                classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix(var) + "PixelSize")
+                String getterSuffix = getterSuffix(var, getterSuffixes);
+                classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffixes + "PixelSize")
                                                  .addModifiers(Modifier.PUBLIC)
                                                  .returns(INT)
                                                  .addStatement("return context.getResources().getDimensionPixelSize(R.dimen." + var + ")")
                                                  .varargs(false)
                                                  .addJavadoc("Returns the dimension R.dimen." + var + " in pixels")
                                                  .build());
+                getterSuffixes.add(getterSuffix);
             } catch (IllegalArgumentException e) {
                 System.out.println("\n\nResourceProvider Compiler Error: " + e.getMessage() + ".\n\nUnable to generate API for R.dimen." + var + "\n\n") ;
             }
@@ -401,7 +422,7 @@ final class RpCodeGenerator {
         return classBuilder.build();
     }
 
-    private String getterSuffix(String varName) {
+    private String getterSuffix(String varName, List<String> getterSuffixes) {
         StringBuilder getterSuffix = new StringBuilder(varName);
         getterSuffix.setCharAt(0, Character.toUpperCase(getterSuffix.charAt(0)));
 
@@ -413,7 +434,14 @@ final class RpCodeGenerator {
             getterSuffix.deleteCharAt(i);
         }
 
-        return getterSuffix.toString();
+        String suffix = getterSuffix.toString();
+        String adjustedSuffix = suffix;
+        int count = 1;
+        while (getterSuffixes.contains(adjustedSuffix)) {
+            adjustedSuffix = suffix + count;
+            count++;
+        }
+        return adjustedSuffix;
     }
 
     class IdInfo {
