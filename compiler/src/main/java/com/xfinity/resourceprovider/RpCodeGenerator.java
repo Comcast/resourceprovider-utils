@@ -405,7 +405,7 @@ final class RpCodeGenerator {
         for (String var : rClassDimenVars) {
             try {
                 String getterSuffix = getterSuffix(var, getterSuffixes);
-                classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffixes + "PixelSize")
+                classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix + "PixelSize")
                                                  .addModifiers(Modifier.PUBLIC)
                                                  .returns(INT)
                                                  .addStatement("return context.getResources().getDimensionPixelSize(R.dimen." + var + ")")
