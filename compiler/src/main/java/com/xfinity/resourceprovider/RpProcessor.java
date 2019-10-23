@@ -220,7 +220,7 @@ public class RpProcessor extends AbstractProcessor {
             drawableProviderJavaFile.writeTo(processingEnv.getFiler());
         }
 
-        boolean generateStringProvider = rDrawableVars.size() > 0;
+        boolean generateStringProvider = rStringVars.size() > 0;
         if (generateStringProvider) {
             TypeSpec stringProviderClass = codeGenerator.generateStringProviderClass();
             JavaFile stringProviderJavaFile = builder(packageName, stringProviderClass).build();
