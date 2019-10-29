@@ -115,3 +115,31 @@ A Java annotation processor that builds a ResourceProvider class which contains 
                  generateDrawableProvider = false,
                  generateStringProvider = false)
   ```
+
+
+Using with Support Library
+=========================
+The default mode of this library is to generate code compatible with the Jetpack/AndroidX libraries.  In order to use this with
+the legacy support library, you must add the following argument to your annotation processor (example is for kapt)
+
+```groovy
+kapt {
+  arguments {
+    arg("resourceProvider.useSupportLibrary", "true")
+  }
+}
+```
+
+Using with Jetpack
+=========================
+The default mode of this library is to generate code compatible with the Jetpack/AndroidX libraries.  However, in order to be
+backward compatible for the legacy version of the support libraries, it includes a string reference to the support library packages.
+This will be flagged by the jetifier feature and will fail.
+
+As such, you should add the android.jetifier.blacklist flag to your main gradle.properties file to exclude this library:
+
+```text
+android.useAndroidX=true
+android.enableJetifier=true
+android.jetifier.blacklist=resourceprovider-compiler-.*\\.jar
+```
