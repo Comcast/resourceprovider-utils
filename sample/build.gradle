@@ -4,17 +4,17 @@ apply plugin: 'kotlin-kapt'
 
 kapt {
     correctErrorTypes = true
-    generateStubs = true
+    useBuildCache = false
 }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     buildToolsVersion '28.0.3'
 
     defaultConfig {
         applicationId 'com.xfinity.resourceprovider.sample'
         minSdkVersion 15
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode 1
         versionName rootProject.publishVersion
     }
@@ -25,13 +25,10 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.0.0'
-    implementation 'com.jakewharton:butterknife:8.7.0'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'com.nhaarman:mockito-kotlin:1.6.0'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
-    compile project(':library')
-
+    api project(':library')
     kapt project(':compiler')
 
     testCompile 'junit:junit:4.12',
