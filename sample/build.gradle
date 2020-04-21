@@ -9,7 +9,7 @@ kapt {
 
 android {
     compileSdkVersion 29
-    buildToolsVersion '28.0.3'
+    buildToolsVersion '29.0.2'
 
     defaultConfig {
         applicationId 'com.xfinity.resourceprovider.sample'
@@ -46,4 +46,30 @@ dependencies {
 }
 repositories {
     mavenCentral()
+}
+
+task buildRClassInfo {
+    dependsOn 'processDebugResources'
+    doLast {
+        String RClassPath = project.buildDir.toString() + "/intermediates/compile_and_runtime_not_namespaced_r_class_jar/debug/"
+        exec {
+            workingDir "$RClassPath"
+            executable 'unzip'
+            args 'R.jar'
+            ignoreExitValue true
+        }
+
+        exec {
+            workingDir "$RClassPath"
+            commandLine "bash", "-c", "find $RClassPath -name '*.class' | xargs javap -p > rclass.txt"
+        }
+
+
+
+        //When we're done Remove everything except  R.jar
+//        exec {
+//            workingDir "$RClassPath"
+//            commandLin 'bash', "-c", "ls | grep -v R.jar | xargs rm -rf"
+//        }
+    }
 }
