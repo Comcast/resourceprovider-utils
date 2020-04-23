@@ -1,3 +1,5 @@
+import com.xfinity.rpplugin.RClassInfoFileConverter
+
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
@@ -64,6 +66,8 @@ task buildRClassInfo {
             commandLine "bash", "-c", "find $RClassPath -name '*.class' | xargs javap -p > rclass.txt"
         }
 
+        def rClassInfoReader = new RClassInfoFileConverter()
+        rClassInfoReader.convertRClassInfo()
 
 
         //When we're done Remove everything except  R.jar
