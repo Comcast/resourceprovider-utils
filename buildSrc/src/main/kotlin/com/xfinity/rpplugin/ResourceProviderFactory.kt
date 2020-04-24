@@ -3,12 +3,13 @@ package com.xfinity.rpplugin
 import java.io.File
 import java.util.StringTokenizer
 
-class RClassInfoFileConverter {
-    fun convertRClassInfo() {
-        parse()
+class ResourceProviderFactory {
+    fun buildResourceProvider(packageName: String, outputDirectory: String) {
+        val rpCodeGenerator  =  RpCodeGenerator(packageName, parseRClassInfoFile(), outputDirectory)
+        rpCodeGenerator.generateCode()
     }
 
-    private fun parse() {
+    private fun parseRClassInfoFile(): RClassInfo {
         val rClassInfo = File("/Users/mdappo200/Projects/resourceprovider/sample/build/intermediates/compile_and_runtime_not_namespaced_r_class_jar/debug/rclass.txt").readText()
         val tokenizer = StringTokenizer(rClassInfo, "$")
 
@@ -39,33 +40,35 @@ class RClassInfoFileConverter {
             }
         }
 
-        rClassStringVars.forEachIndexed {index, name ->
-            System.out.println("String $index = $name")
-        }
+//        rClassStringVars.forEachIndexed {index, name ->
+//            System.out.println("String $index = $name")
+//        }
+//
+//        rClassPluralVars.forEachIndexed {index, name ->
+//            System.out.println("Plural $index = $name")
+//        }
+//
+//        rClassDrawableVars.forEachIndexed {index, name ->
+//            System.out.println("Drawable $index = $name")
+//        }
+//
+//        rClassDimenVars.forEachIndexed {index, name ->
+//            System.out.println("Dimen $index = $name")
+//        }
+//
+//        rClassIntegerVars.forEachIndexed {index, name ->
+//            System.out.println("Int $index = $name")
+//        }
+//
+//        rClassColorVars.forEachIndexed {index, name ->
+//            System.out.println("Color $index = $name")
+//        }
+//
+//        rClassIdVars.forEachIndexed {index, name ->
+//            System.out.println("Id $index = $name")
+//        }
 
-        rClassPluralVars.forEachIndexed {index, name ->
-            System.out.println("Plural $index = $name")
-        }
-
-        rClassDrawableVars.forEachIndexed {index, name ->
-            System.out.println("Drawable $index = $name")
-        }
-
-        rClassDimenVars.forEachIndexed {index, name ->
-            System.out.println("Dimen $index = $name")
-        }
-
-        rClassIntegerVars.forEachIndexed {index, name ->
-            System.out.println("Int $index = $name")
-        }
-
-        rClassColorVars.forEachIndexed {index, name ->
-            System.out.println("Color $index = $name")
-        }
-
-        rClassIdVars.forEachIndexed {index, name ->
-            System.out.println("Id $index = $name")
-        }
+        return RClassInfo(rClassStringVars, rClassPluralVars, rClassDrawableVars, rClassDimenVars, rClassIntegerVars, rClassColorVars, rClassIdVars)
     }
 
     private fun parseClass(classString: String, varsList: MutableList<String>){
@@ -93,10 +96,10 @@ class RClassInfoFileConverter {
     }
 }
 
-data class RClassInfo(private val rClassStringVars: List<String>,
-                      private val rClassPluralVars: List<String>,
-                      private val rClassDrawableVars: List<String>,
-                      private val rClassDimenVars: List<String>,
-                      private val rClassIntegerVars: List<String>,
-                      private val rClassColorVars: List<String>,
-                      private val rClassIdVars: List<String>)
+data class RClassInfo(val rClassStringVars: List<String>,
+                      val rClassPluralVars: List<String>,
+                      val rClassDrawableVars: List<String>,
+                      val rClassDimenVars: List<String>,
+                      val rClassIntegerVars: List<String>,
+                      val rClassColorVars: List<String>,
+                      val rClassIdVars: List<String>)

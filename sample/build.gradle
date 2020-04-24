@@ -1,4 +1,4 @@
-import com.xfinity.rpplugin.RClassInfoFileConverter
+import com.xfinity.rpplugin.ResourceProviderFactory
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
@@ -9,12 +9,15 @@ kapt {
     useBuildCache = false
 }
 
+ext {
+    appId = 'com.xfinity.resourceprovider.sample'
+}
 android {
     compileSdkVersion 29
     buildToolsVersion '29.0.2'
 
     defaultConfig {
-        applicationId 'com.xfinity.resourceprovider.sample'
+        applicationId appId
         minSdkVersion 15
         targetSdkVersion 29
         versionCode 1
@@ -50,7 +53,7 @@ repositories {
     mavenCentral()
 }
 
-task buildRClassInfo {
+task buildResourceProvider {
     dependsOn 'processDebugResources'
     doLast {
         String RClassPath = project.buildDir.toString() + "/intermediates/compile_and_runtime_not_namespaced_r_class_jar/debug/"
@@ -66,9 +69,8 @@ task buildRClassInfo {
             commandLine "bash", "-c", "find $RClassPath -name '*.class' | xargs javap -p > rclass.txt"
         }
 
-        def rClassInfoReader = new RClassInfoFileConverter()
-        rClassInfoReader.convertRClassInfo()
-
+        def resourceProviderFactory = new ResourceProviderFactory()
+        resourceProviderFactory.buildResourceProvider(appId, "${project.buildDir.toString()}/generated/source/kapt/debug")
 
         //When we're done Remove everything except  R.jar
 //        exec {

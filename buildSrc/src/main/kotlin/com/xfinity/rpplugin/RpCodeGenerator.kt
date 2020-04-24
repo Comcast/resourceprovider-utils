@@ -14,15 +14,7 @@ import java.util.ArrayList
 import java.util.Arrays
 import javax.lang.model.element.Modifier
 
-class RpCodeGenerator(private val packageName: String,
-                      private val rClassStringVars: List<String>?,
-                      private val rClassPluralVars: List<String>?,
-                      private val rClassDrawableVars: List<String>?,
-                      private val rClassDimenVars: List<String>?,
-                      private val rClassIntegerVars: List<String>?,
-                      private val rClassColorVars: List<String>?,
-                      private val rClassIdVars: List<String>?) {
-
+class RpCodeGenerator(private val packageName: String, private val rClassInfo: RClassInfo, private val outputDirectoryName: String) {
     private val contextClassName = ClassName.get("android.content", "Context")
     private val contextField = FieldSpec.builder(contextClassName, "context", Modifier.PRIVATE).build()
     private val suppressLint = AnnotationSpec.builder(ClassName.get("android.annotation", "SuppressLint"))
@@ -30,56 +22,47 @@ class RpCodeGenerator(private val packageName: String,
             .build()
     private val contextCompatClassName: TypeName = ClassName.get("androidx.core.content", "ContextCompat")
 
-    private fun generateCode(packageName: String, rStringVars: List<String>, rPluralVars: List<String>,
-                             rDrawableVars: List<String>, rDimenVars: List<String>, rIntegerVars: List<String>,
-                             rColorVars: List<String>, rIdVars: List<String>) {
-        val codeGenerator = RpCodeGenerator(packageName, rStringVars, rPluralVars, rDrawableVars, rDimenVars,
-                rIntegerVars, rColorVars, rIdVars)
-        val generateIdProvider = rIdVars.size > 0
-        val idProviderFile = File("IdProvider.java")
-        val intProviderFile = File("IntProvider.java")
-        val dimenProviderFile = File("DimenProvider.java")
-        val colorProviderFile = File("ColorProvider.java")
-        val drawableProviderFile = File("DrawableProvider.java")
-        val stringProviderFile = File("StringProvider.java")
-        val resourceProviderFile = File("ResourceProvider.java")
+    fun generateCode() {
+        val generateIdProvider = rClassInfo.rClassIdVars.size > 0
+
+        val outputDirectory = File(outputDirectoryName)
 
         if (generateIdProvider) {
-            val idProviderClass: TypeSpec = codeGenerator.generateIdProviderClass()
+            val idProviderClass: TypeSpec = generateIdProviderClass()
             val idProviderJavaFile = JavaFile.builder(packageName, idProviderClass).build()
-            idProviderJavaFile.writeTo(idProviderFile)
+            idProviderJavaFile.writeTo(outputDirectory)
         }
-        val generateIntegerProvider = rIntegerVars.size > 0
+        val generateIntegerProvider = rClassInfo.rClassIntegerVars.size > 0
         if (generateIntegerProvider) {
-            val integerProviderClass: TypeSpec = codeGenerator.generateIntegerProviderClass()
+            val integerProviderClass: TypeSpec = generateIntegerProviderClass()
             val integerProviderJavaFile = JavaFile.builder(packageName, integerProviderClass).build()
-            integerProviderJavaFile.writeTo(intProviderFile)
+            integerProviderJavaFile.writeTo(outputDirectory)
         }
-        val generateDimensionProvider = rDimenVars.size > 0
+        val generateDimensionProvider = rClassInfo.rClassDimenVars.size > 0
         if (generateDimensionProvider) {
-            val dimensionProviderClass: TypeSpec = codeGenerator.generateDimensionProviderClass()
+            val dimensionProviderClass: TypeSpec = generateDimensionProviderClass()
             val dimensionProviderJavaFile = JavaFile.builder(packageName, dimensionProviderClass).build()
-            dimensionProviderJavaFile.writeTo(dimenProviderFile)
+            dimensionProviderJavaFile.writeTo(outputDirectory)
         }
-        val generateColorProvider = rColorVars.size > 0
+        val generateColorProvider = rClassInfo.rClassColorVars.size > 0
         if (generateColorProvider) {
-            val colorProviderClass: TypeSpec = codeGenerator.generateColorProviderClass()
+            val colorProviderClass: TypeSpec = generateColorProviderClass()
             val colorProviderJavaFile = JavaFile.builder(packageName, colorProviderClass).build()
-            colorProviderJavaFile.writeTo(colorProviderFile)
+            colorProviderJavaFile.writeTo(outputDirectory)
         }
-        val generateDrawableProvider = rDrawableVars.size > 0
+        val generateDrawableProvider = rClassInfo.rClassDrawableVars.size > 0
         if (generateDrawableProvider) {
-            val drawableProviderClass: TypeSpec = codeGenerator.generateDrawableProviderClass()
+            val drawableProviderClass: TypeSpec = generateDrawableProviderClass()
             val drawableProviderJavaFile = JavaFile.builder(packageName, drawableProviderClass).build()
-            drawableProviderJavaFile.writeTo(drawableProviderFile)
+            drawableProviderJavaFile.writeTo(outputDirectory)
         }
-        val generateStringProvider = rStringVars.size > 0
+        val generateStringProvider = rClassInfo.rClassStringVars.size > 0
         if (generateStringProvider) {
-            val stringProviderClass: TypeSpec = codeGenerator.generateStringProviderClass()
+            val stringProviderClass: TypeSpec = generateStringProviderClass()
             val stringProviderJavaFile = JavaFile.builder(packageName, stringProviderClass).build()
-            stringProviderJavaFile.writeTo(stringProviderFile)
+            stringProviderJavaFile.writeTo(outputDirectory)
         }
-        val resourceProviderClass: TypeSpec = codeGenerator.generateResourceProviderClass(
+        val resourceProviderClass: TypeSpec = generateResourceProviderClass(
                 generateIdProvider,
                 generateIntegerProvider,
                 generateDimensionProvider,
@@ -88,7 +71,7 @@ class RpCodeGenerator(private val packageName: String,
                 generateStringProvider)
 
         val resourceProviderJavaFile = JavaFile.builder(packageName, resourceProviderClass).build()
-        resourceProviderJavaFile.writeTo(resourceProviderFile)
+        resourceProviderJavaFile.writeTo(outputDirectory)
     }
 
     fun generateResourceProviderClass(generateIdProvider: Boolean,
@@ -214,7 +197,7 @@ class RpCodeGenerator(private val packageName: String,
                 .addMethod(constructor)
                 .addAnnotation(suppressLint)
         val stringGetterSuffixes: MutableList<String> = ArrayList()
-        for (`var` in rClassStringVars!!) {
+        for (`var` in rClassInfo.rClassStringVars) {
             val objectVarArgsType = ArrayTypeName.get(Array<Any>::class.java)
             val parameterSpec = ParameterSpec.builder(objectVarArgsType, "formatArgs").build()
             try {
@@ -232,7 +215,7 @@ class RpCodeGenerator(private val packageName: String,
             }
         }
         val pluralsGetterSuffixes: MutableList<String> = ArrayList()
-        for (`var` in rClassPluralVars!!) {
+        for (`var` in rClassInfo.rClassPluralVars) {
             val objectVarArgsType = ArrayTypeName.get(Array<Any>::class.java)
             val formatArgsParameterSpec = ParameterSpec.builder(objectVarArgsType, "formatArgs").build()
             val quantityParameterSpec = ParameterSpec.builder(TypeName.INT, "quantity").build()
@@ -267,7 +250,7 @@ class RpCodeGenerator(private val packageName: String,
                 .addMethod(constructor)
                 .addAnnotation(suppressLint)
         val getterSuffixes: MutableList<String> = ArrayList()
-        for (`var` in rClassDrawableVars!!) {
+        for (`var` in rClassInfo.rClassDrawableVars) {
             try {
                 val getterSuffix = getterSuffix(`var`, getterSuffixes)
                 classBuilder.addMethod(MethodSpec.methodBuilder("get$getterSuffix")
@@ -296,7 +279,7 @@ class RpCodeGenerator(private val packageName: String,
                 .addMethod(constructor)
                 .addAnnotation(suppressLint)
         val getterSuffixes: MutableList<String> = ArrayList()
-        for (`var` in rClassColorVars!!) {
+        for (`var` in rClassInfo.rClassColorVars) {
             try {
                 val getterSuffix = getterSuffix(`var`, getterSuffixes)
                 classBuilder.addMethod(MethodSpec.methodBuilder("get$getterSuffix")
@@ -325,7 +308,7 @@ class RpCodeGenerator(private val packageName: String,
                 .addMethod(constructor)
                 .addAnnotation(suppressLint)
         val getterSuffixes: MutableList<String> = ArrayList()
-        for (`var` in rClassIntegerVars!!) {
+        for (`var` in rClassInfo.rClassIntegerVars) {
             try {
                 val getterSuffix = getterSuffix(`var`, getterSuffixes)
                 classBuilder.addMethod(MethodSpec.methodBuilder("get$getterSuffix")
@@ -353,16 +336,16 @@ class RpCodeGenerator(private val packageName: String,
                 .addField(contextField)
                 .addMethod(constructor)
                 .addAnnotation(suppressLint)
-        val idInfoList = Arrays.asList(IdInfo("R.id.", "", rClassIdVars),
-                IdInfo("R.string.", "String", rClassStringVars),
-                IdInfo("R.plurals.", "Plural", rClassPluralVars),
-                IdInfo("R.drawable.", "Drawable", rClassDrawableVars),
-                IdInfo("R.dimen.", "Dimen", rClassDimenVars),
-                IdInfo("R.integer.", "Integer", rClassIntegerVars),
-                IdInfo("R.color.", "Color", rClassColorVars))
+        val idInfoList = Arrays.asList(IdInfo("R.id.", "", rClassInfo.rClassIdVars),
+                IdInfo("R.string.", "String", rClassInfo.rClassStringVars),
+                IdInfo("R.plurals.", "Plural", rClassInfo.rClassPluralVars),
+                IdInfo("R.drawable.", "Drawable", rClassInfo.rClassDrawableVars),
+                IdInfo("R.dimen.", "Dimen", rClassInfo.rClassDimenVars),
+                IdInfo("R.integer.", "Integer", rClassInfo.rClassIntegerVars),
+                IdInfo("R.color.", "Color", rClassInfo.rClassColorVars))
         val getterSuffixes: MutableList<String> = ArrayList()
         for (info in idInfoList) {
-            for (`var` in info.classVars!!) {
+            for (`var` in info.classVars) {
                 try {
                     val getterSuffix = getterSuffix(`var`, getterSuffixes)
                     classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix + info.resType + "Id")
@@ -392,7 +375,7 @@ class RpCodeGenerator(private val packageName: String,
                 .addMethod(constructor)
                 .addAnnotation(suppressLint)
         val getterSuffixes: MutableList<String> = ArrayList()
-        for (`var` in rClassDimenVars!!) {
+        for (`var` in rClassInfo.rClassDimenVars) {
             try {
                 val getterSuffix = getterSuffix(`var`, getterSuffixes)
                 classBuilder.addMethod(MethodSpec.methodBuilder("get" + getterSuffix + "PixelSize")
@@ -430,5 +413,5 @@ class RpCodeGenerator(private val packageName: String,
         return adjustedSuffix
     }
 
-    internal class IdInfo(var idResPrefix: String, var resType: String, var classVars: List<String>?)
+    internal class IdInfo(var idResPrefix: String, var resType: String, var classVars: List<String>)
 }
