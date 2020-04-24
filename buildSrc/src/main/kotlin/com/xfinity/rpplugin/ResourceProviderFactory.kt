@@ -40,34 +40,6 @@ class ResourceProviderFactory {
             }
         }
 
-//        rClassStringVars.forEachIndexed {index, name ->
-//            System.out.println("String $index = $name")
-//        }
-//
-//        rClassPluralVars.forEachIndexed {index, name ->
-//            System.out.println("Plural $index = $name")
-//        }
-//
-//        rClassDrawableVars.forEachIndexed {index, name ->
-//            System.out.println("Drawable $index = $name")
-//        }
-//
-//        rClassDimenVars.forEachIndexed {index, name ->
-//            System.out.println("Dimen $index = $name")
-//        }
-//
-//        rClassIntegerVars.forEachIndexed {index, name ->
-//            System.out.println("Int $index = $name")
-//        }
-//
-//        rClassColorVars.forEachIndexed {index, name ->
-//            System.out.println("Color $index = $name")
-//        }
-//
-//        rClassIdVars.forEachIndexed {index, name ->
-//            System.out.println("Id $index = $name")
-//        }
-
         return RClassInfo(rClassStringVars, rClassPluralVars, rClassDrawableVars, rClassDimenVars, rClassIntegerVars, rClassColorVars, rClassIdVars)
     }
 
