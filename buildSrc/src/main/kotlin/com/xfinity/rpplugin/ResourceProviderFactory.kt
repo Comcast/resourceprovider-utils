@@ -7,30 +7,49 @@ import java.util.StringTokenizer
 
 class ResourceProviderPlugin : Plugin<Project> {
     override fun apply(project: Project) {
-        // Add the 'greeting' extension object
-        // Add a task that uses configuration from the extension object
         val extension = project.extensions.create<ResourceProviderPluginExtension>("resourceprovider", ResourceProviderPluginExtension::class.java)
-        project.task("generateResourceProvider") {
-            it.doLast {
-                val rClassFile = File(project.buildDir.toString() + "/intermediates/compile_and_runtime_not_namespaced_r_class_jar/debug/")
-                project.exec {
-                    it.workingDir = rClassFile
-                    it.executable = "unzip"
-                    it.args = listOf("R.jar")
-                    it.isIgnoreExitValue = true
-                }
+        project.tasks.whenTaskAdded{ task ->
+            if(task.name.startsWith("process") && task.name.contains("Resources") && !task.name.contains("Test")){
+                val index = task.name.indexOf("Resources")
+                val variantName = task.name.substring(7, index)
 
-                project.exec {
-                    it.workingDir = rClassFile
-                    it.commandLine = listOf("bash", "-c", "find ${rClassFile.absolutePath} -name '*.class' | xargs javap -p > rclass.txt")
-                }
+                project.task("generate${variantName}ResourceProvider") {
+                    it.doLast {
+                        generateResourceProviderForVariant(project, extension, variantName)
+                    }
+                }.dependsOn(task)
 
-                extension.applicationId?.let {
-                    val resourceProviderFactory = ResourceProviderFactory()
-                    resourceProviderFactory.buildResourceProvider(it, project.buildDir.toString(),
-                            "${project.buildDir.toString()}/generated/source/kapt/debug")
-                }
+                println("Variant Name: $variantName , TaskName: $task.name")
             }
+
+            if(task.name.startsWith("compile") && task.name.contains("JavaWithJavac") && !task.name.contains("Test")){
+                val index = task.name.indexOf("JavaWithJavac")
+                val variantName = task.name.substring(7, index)
+                println("Variant Name: $variantName , TaskName: $task.name")
+
+                task.dependsOn("generate${variantName}ResourceProvider")
+            }
+        }
+    }
+
+    fun generateResourceProviderForVariant(project: Project, extension: ResourceProviderPluginExtension, variantName: String) {
+        val rClassDir = File(project.buildDir.toString() + "/intermediates/compile_and_runtime_not_namespaced_r_class_jar/$variantName/")
+        project.exec {
+            it.workingDir = rClassDir
+            it.executable = "unzip"
+            it.args = listOf("R.jar")
+            it.isIgnoreExitValue = true
+        }
+
+        project.exec {
+            it.workingDir = rClassDir
+            it.commandLine = listOf("bash", "-c", "find ${rClassDir.absolutePath} -name '*.class' | xargs javap -p > rclass.txt")
+        }
+
+        extension.applicationId?.let {
+            val resourceProviderFactory = ResourceProviderFactory()
+            resourceProviderFactory.buildResourceProvider(it, variantName, project.buildDir.toString(),
+                    "${project.buildDir.toString()}/generated/source/kapt/$variantName")
         }
     }
 }
@@ -40,13 +59,13 @@ open class ResourceProviderPluginExtension {
 }
 
 class ResourceProviderFactory {
-    fun buildResourceProvider(packageName: String, buildDirectory: String, outputDirectory: String) {
-        val rpCodeGenerator  =  RpCodeGenerator(packageName, parseRClassInfoFile(buildDirectory), outputDirectory)
+    fun buildResourceProvider(packageName: String, variantName: String, buildDirectory: String, outputDirectory: String) {
+        val rpCodeGenerator  =  RpCodeGenerator(packageName, parseRClassInfoFile(buildDirectory, variantName), outputDirectory)
         rpCodeGenerator.generateCode()
     }
 
-    private fun parseRClassInfoFile(buildDirectory: String): RClassInfo {
-        val rClassInfo = File("$buildDirectory/intermediates/compile_and_runtime_not_namespaced_r_class_jar/debug/rclass.txt").readText()
+    private fun parseRClassInfoFile(buildDirectory: String, variantName: String): RClassInfo {
+        val rClassInfo = File("$buildDirectory/intermediates/compile_and_runtime_not_namespaced_r_class_jar/${variantName}/rclass.txt").readText()
         val tokenizer = StringTokenizer(rClassInfo, "$")
 
         val rClassStringVars = mutableListOf<String>()
