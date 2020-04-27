@@ -3,6 +3,7 @@ import com.xfinity.rpplugin.ResourceProviderFactory
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'resourceprovider'
 
 kapt {
     correctErrorTypes = true
@@ -12,6 +13,11 @@ kapt {
 ext {
     appId = 'com.xfinity.resourceprovider.sample'
 }
+
+resourceprovider {
+    applicationId = project.appId
+}
+
 android {
     compileSdkVersion 29
     buildToolsVersion '29.0.2'
@@ -53,29 +59,7 @@ repositories {
     mavenCentral()
 }
 
-task buildResourceProvider {
-    dependsOn 'processDebugResources'
-    doLast {
-        String RClassPath = project.buildDir.toString() + "/intermediates/compile_and_runtime_not_namespaced_r_class_jar/debug/"
-        exec {
-            workingDir "$RClassPath"
-            executable 'unzip'
-            args 'R.jar'
-            ignoreExitValue true
-        }
-
-        exec {
-            workingDir "$RClassPath"
-            commandLine "bash", "-c", "find $RClassPath -name '*.class' | xargs javap -p > rclass.txt"
-        }
-
-        def resourceProviderFactory = new ResourceProviderFactory()
-        resourceProviderFactory.buildResourceProvider(appId, "${project.buildDir.toString()}/generated/source/kapt/debug")
-
-        //When we're done Remove everything except  R.jar
-//        exec {
-//            workingDir "$RClassPath"
-//            commandLin 'bash', "-c", "ls | grep -v R.jar | xargs rm -rf"
-//        }
-    }
+project.afterEvaluate {
+    generateResourceProvider.dependsOn processDebugResourcesprocessDebugResources
+    compileDebugJavaWithJavac.dependsOn generateResourceProvider
 }
