@@ -60,6 +60,6 @@ repositories {
 }
 
 project.afterEvaluate {
-    generateResourceProvider.dependsOn processDebugResourcesprocessDebugResources
+    generateResourceProvider.dependsOn processDebugResources
     compileDebugJavaWithJavac.dependsOn generateResourceProvider
 }
