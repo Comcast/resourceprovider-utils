@@ -1,9 +1,7 @@
 package com.xfinity.resourceprovider.sample;
 
 import android.app.Application;
-import com.xfinity.resourceprovider.RpApplication;
 
-@RpApplication
 public class MyApplication extends Application {
     private ResourceProvider resourceProvider;
 
