@@ -7,7 +7,7 @@ import java.util.StringTokenizer
 
 class ResourceProviderPlugin : Plugin<Project> {
     override fun apply(project: Project) {
-        val extension = project.extensions.create<ResourceProviderPluginExtension>("resourceprovider", ResourceProviderPluginExtension::class.java)
+        val extension = project.extensions.create<ResourceProviderPluginExtension>(RP_PLUGIN_NAME, ResourceProviderPluginExtension::class.java)
         project.tasks.whenTaskAdded{ task ->
             if(task.name.startsWith("process") && task.name.contains("Resources") && !task.name.contains("Test")){
                 val index = task.name.indexOf("Resources")
@@ -18,15 +18,11 @@ class ResourceProviderPlugin : Plugin<Project> {
                         generateResourceProviderForVariant(project, extension, variantName)
                     }
                 }.dependsOn(task)
-
-                println("Variant Name: $variantName , TaskName: $task.name")
             }
 
             if(task.name.startsWith("compile") && task.name.contains("JavaWithJavac") && !task.name.contains("Test")){
                 val index = task.name.indexOf("JavaWithJavac")
                 val variantName = task.name.substring(7, index)
-                println("Variant Name: $variantName , TaskName: $task.name")
-
                 task.dependsOn("generate${variantName}ResourceProvider")
             }
         }
@@ -51,6 +47,10 @@ class ResourceProviderPlugin : Plugin<Project> {
             resourceProviderFactory.buildResourceProvider(it, variantName, project.buildDir.toString(),
                     "${project.buildDir.toString()}/generated/source/kapt/$variantName")
         }
+    }
+
+    companion object {
+        const val RP_PLUGIN_NAME = "resourceprovider"
     }
 }
 
@@ -103,8 +103,8 @@ class ResourceProviderFactory {
         val rawVarsList = mutableListOf<String>()
         while (varTokenizer.hasMoreTokens()) {
             val varToken = varTokenizer.nextToken()
-            val varName = varToken.substringAfter(VAR_PREFIX, "missing").trim(';')
-            if (varName != "missing") {
+            val varName = varToken.substringAfter(VAR_PREFIX, MISSING).trim(';')
+            if (varName != MISSING) {
                 rawVarsList.add(varName)
             }
         }
@@ -120,6 +120,7 @@ class ResourceProviderFactory {
         const val COLOR_PREFIX = "color {"
         const val ID_PREFIX = "id {"
         const val VAR_PREFIX = "public static final int "
+        const val MISSING = "missing"
     }
 }
 
