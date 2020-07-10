@@ -1,7 +1,10 @@
+plugins {
+    id 'com.xfinity.resourceprovider' version "1.2.0"
+}
+
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
-apply plugin: 'resourceprovider'
 
 kapt {
     correctErrorTypes = true
@@ -13,7 +16,7 @@ ext {
 }
 
 resourceprovider {
-    applicationId = project.appId
+    packageName = project.appId
 }
 
 android {
@@ -31,6 +34,42 @@ android {
     lintOptions {
         disable 'InvalidPackage'
     }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+        debug {
+            minifyEnabled false
+            debuggable true
+        }
+    }
+
+    flavorDimensions "endpoint"
+    productFlavors {
+        store {
+            dimension "endpoint"
+            applicationId 'com.xfinity.resourceprovider.sample'
+        }
+        prod {
+            dimension "endpoint"
+            applicationId 'com.xfinity.resourceprovider.sample.prod'
+        }
+        preprod {
+            dimension "endpoint"
+            applicationId 'com.xfinity.resourceprovider.sample.preprod'
+        }
+        staging {
+            dimension "endpoint"
+            applicationId 'com.xfinity.resourceprovider.sample.staging'
+        }
+        ci {
+            dimension "endpoint"
+            applicationId 'com.xfinity.resourceprovider.sample.ci'
+        }
+    }
 }
 
 dependencies {
@@ -38,15 +77,15 @@ dependencies {
     implementation 'com.nhaarman:mockito-kotlin:1.6.0'
 
     testCompile 'junit:junit:4.12',
-                'org.mockito:mockito-core:2.7.21',
-                project(':testutils'),
-                project(':library')
+            'org.mockito:mockito-core:2.7.21',
+            project(':testutils'),
+            project(':library')
 
     testImplementation('com.nhaarman:mockito-kotlin:1.4.0',
-                       {
-                           exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib'
-                           exclude group: 'org.jetbrains.kotlin', module: 'kotlin-reflect'
-                       })
+            {
+                exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib'
+                exclude group: 'org.jetbrains.kotlin', module: 'kotlin-reflect'
+            })
 
     kaptTest project(':compiler')
 }

@@ -1,0 +1,13 @@
+<resources>
+
+  <string name="app_name">Resource Provider Sample</string>
+  <string name="appName">Resource Provider Sample</string>
+  <string name="AppName">Resource Provider Sample</string>
+  <string name="appname">Resource Provider Sample</string>
+  <string name="activity_a">Activity A</string>
+  <string name="activity_b">Activity B</string>
+  <string name="one_arg_formatted_string">This format string has %1$d args</string>
+  <string name="first_half_of_month">This month isn\'t even half over…</string>
+  <string name="second_half_of_month">This month is almost over!</string>
+  <string name="saturday">It\'s Saturday!</string>
+</resources>
