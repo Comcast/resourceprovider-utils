@@ -1,5 +1,5 @@
 plugins {
-    id 'com.xfinity.resourceprovider' version "1.2.0"
+    id 'com.xfinity.resourceprovider'
 }
 
 apply plugin: 'com.android.library'
@@ -42,7 +42,13 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.core:core-ktx:1.0.2'
-    testImplementation 'junit:junit:4.12'
+
+    testImplementation 'junit:junit:4.12',
+            'org.mockito:mockito-core:2.7.21',
+            'com.xfinity:resourceprovider-testutils:1.2.1',
+
+    testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:1.4.0'
+
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 }
