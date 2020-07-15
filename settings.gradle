@@ -1,2 +1,1 @@
-include ':library', ':compiler', ':sample', ':testutils'
-include ':sample-library'
+include ':sample', ':sample-library', ':testutils'
