@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="days_until_friday">
+        <item quantity="one">Only 1 day until Friday!</item>
+        <item quantity="other">%d days until Friday</item>
+    </plurals>
+</resources>

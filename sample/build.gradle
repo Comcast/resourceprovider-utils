@@ -1,20 +1,32 @@
+plugins {
+    id 'com.xfinity.resourceprovider'
+}
+
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
 kapt {
     correctErrorTypes = true
-    generateStubs = true
+    useBuildCache = false
+}
+
+ext {
+    appId = 'com.xfinity.resourceprovider.sample'
+}
+
+resourceprovider {
+    packageName = project.appId
 }
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion '28.0.3'
+    compileSdkVersion 29
+    buildToolsVersion '29.0.2'
 
     defaultConfig {
-        applicationId 'com.xfinity.resourceprovider.sample'
+        applicationId appId
         minSdkVersion 15
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode 1
         versionName rootProject.publishVersion
     }
@@ -22,30 +34,52 @@ android {
     lintOptions {
         disable 'InvalidPackage'
     }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+        debug {
+            minifyEnabled false
+            debuggable true
+        }
+    }
+
+    flavorDimensions "endpoint"
+    productFlavors {
+        store {
+            dimension "endpoint"
+            applicationId 'com.xfinity.resourceprovider.sample'
+        }
+        prod {
+            dimension "endpoint"
+            applicationId 'com.xfinity.resourceprovider.sample.prod'
+        }
+        preprod {
+            dimension "endpoint"
+            applicationId 'com.xfinity.resourceprovider.sample.preprod'
+        }
+        staging {
+            dimension "endpoint"
+            applicationId 'com.xfinity.resourceprovider.sample.staging'
+        }
+        ci {
+            dimension "endpoint"
+            applicationId 'com.xfinity.resourceprovider.sample.ci'
+        }
+    }
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.0.0'
-    implementation 'com.jakewharton:butterknife:8.7.0'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'com.nhaarman:mockito-kotlin:1.6.0'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
-    compile project(':library')
-
-    kapt project(':compiler')
-
-    testCompile 'junit:junit:4.12',
-                'org.mockito:mockito-core:2.7.21',
-                project(':testutils'),
-                project(':library')
-
-    testImplementation('com.nhaarman:mockito-kotlin:1.4.0',
-                       {
-                           exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib'
-                           exclude group: 'org.jetbrains.kotlin', module: 'kotlin-reflect'
-                       })
-
-    kaptTest project(':compiler')
+    testImplementation 'junit:junit:4.12',
+            'org.mockito:mockito-core:2.7.21',
+            'com.xfinity:resourceprovider-testutils:1.2.1',
+            'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0'
 }
 repositories {
     mavenCentral()

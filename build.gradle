@@ -1,18 +1,21 @@
 buildscript {
-    ext.kotlin_version = '1.2.51'
+    ext.kotlin_version = '1.3.61'
     repositories {
         jcenter()
         google()
+        mavenLocal()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.1'
+        classpath 'com.android.tools.build:gradle:3.6.2'
         classpath 'com.novoda:bintray-release:0.2.10'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "com.xfinity:resourceprovider:1.3.0"
     }
 }
 
 allprojects {
     repositories {
+        mavenLocal()
         jcenter()
         google()
     }

@@ -1,4 +1,4 @@
-package com.xfinity.resourceprovider.sample;
+package com.xfinity.resourceprovider.sample_library;
 
 import android.app.Application;
 
