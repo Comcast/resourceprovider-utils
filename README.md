@@ -1,6 +1,9 @@
 Android Resource Provider Test Utilities and Samples
 ======================
 
+   Resource Provider is now a gradle plugin!  If you were using the Annotation Processor version, and want to upgrade, check out the new setup instructions [here](https://github.com/Comcast/resourceprovider2).
+======================   
+
    Resource Provider is a gradle plugin that generates a class which contains APIs to get Android Resources
 
    Resource Provider allows the presentation layer in your MVP implementation to explicitly control presentation details
